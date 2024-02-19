@@ -3,8 +3,10 @@
 namespace App\Entity;
 
 use App\Repository\CoffeeRepository;
+use DateTime;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: CoffeeRepository::class)]
 class Coffee
@@ -12,24 +14,31 @@ class Coffee
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(["getCoffee"])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(["getCoffee"])]
     private ?string $name = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[Groups(["getCoffee"])]
     private ?\DateTimeInterface $updated_at = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[Groups(["getCoffee"])]
     private ?\DateTimeInterface $created_at = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(["getCoffee"])]
     private ?string $status = null;
 
     #[ORM\Column(type: Types::TEXT)]
+    #[Groups(["getCoffee"])]
     private ?string $description = null;
 
     #[ORM\ManyToOne(inversedBy: 'coffees')]
+    #[Groups(["getCoffee"])]
     private ?Category $category = null;
 
     public function getId(): ?int
@@ -54,9 +63,16 @@ class Coffee
         return $this->updated_at;
     }
 
-    public function setUpdatedAt(\DateTimeInterface $updated_at): static
+    public function setUpdatedAtTo(\DateTimeInterface $updated_at): static
     {
         $this->updated_at = $updated_at;
+
+        return $this;
+    }
+
+    public function setUpdatedAt(): static
+    {
+        $this->updated_at = new DateTime();
 
         return $this;
     }
@@ -66,7 +82,14 @@ class Coffee
         return $this->created_at;
     }
 
-    public function setCreatedAt(\DateTimeInterface $created_at): static
+    public function setCreatedAt(): static
+    {
+        $this->created_at = new DateTime();
+
+        return $this;
+    }
+
+    public function setCreatedAtTo(\DateTimeInterface $created_at): static
     {
         $this->created_at = $created_at;
 

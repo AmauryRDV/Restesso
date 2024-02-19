@@ -35,12 +35,12 @@ class AppFixtures extends Fixture
 
             for ($i = 0; $i < 5; $i++) {
                 $ig = new Coffee();
-                $ig->setName("coffe ". $i+$j*5);
+                $ig->setName("coffee ". $i+$j*5);
                 $ig->setDescription("desc ". $i+$j*5);
                 $createdAt = $this->faker->dateTimeBetween("-1 week","now");
                 $updatedAt = $this->faker->dateTimeBetween($createdAt,"now");
-                $ig->setCreatedAt($createdAt);
-                $ig->setUpdatedAt($updatedAt);
+                $ig->setCreatedAt();
+                $ig->setUpdatedAt();
                 $ig->setStatus("on");
                 $ig->setCategory($category);
                 $manager->persist($ig);
