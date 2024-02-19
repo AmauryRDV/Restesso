@@ -16,9 +16,11 @@ class Category
     #[ORM\GeneratedValue]
     #[ORM\Column]
     #[Groups(["getCoffee"])]
+    #[Groups(["getAllCategories"])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(["getAllCategories"])]
     private ?string $name = null;
 
     #[ORM\OneToMany(mappedBy: 'category', targetEntity: Coffee::class)]
@@ -90,9 +92,16 @@ class Category
         return $this->create_at;
     }
 
-    public function setCreateAt(\DateTimeInterface $create_at): static
+    public function setCreatedAtTo(\DateTimeInterface $create_at): static
     {
         $this->create_at = $create_at;
+
+        return $this;
+    }
+
+    public function setCreatedAt(): static
+    {
+        $this->create_at = new \DateTime();
 
         return $this;
     }
@@ -102,9 +111,16 @@ class Category
         return $this->updated_at;
     }
 
-    public function setUpdatedAt(\DateTimeInterface $updated_at): static
+    public function setUpdatedAtTo(\DateTimeInterface $updated_at): static
     {
         $this->updated_at = $updated_at;
+
+        return $this;
+    }
+
+    public function setUpdatedAt(): static
+    {
+        $this->updated_at = new \DateTime();
 
         return $this;
     }
