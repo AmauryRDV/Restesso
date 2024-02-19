@@ -1,3 +1,4 @@
 # Restesso
 Un repas, un café, un Restesso
-<img src="https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.icegif.com%2Fcoffee-62%2F&psig=AOvVaw1SmL6qNxsB4iWmx5Q1-xDr&ust=1708444492065000&source=images&cd=vfe&opi=89978449&ved=0CBIQjRxqFwoTCOiwserht4QDFQAAAAAdAAAAABAE" alt="coffee" />
+<img src="![image](https://github.com/AmauryRDV/Restesso/assets/97154136/ac72546b-a0a2-4102-8da5-b077c26ba56f)
+" alt="coffee" />
