@@ -44,24 +44,34 @@ class CategoryController extends AbstractController
         }
 
         #[Route('/api/v1/category', name:"category.create", methods: ['POST'])]
-        public function createCategory(Request $request,UrlGeneratorInterface $urlGenerator,SerializerInterface $serializer, EntityManagerInterface $manager)
+        public function createCategory(Request $request,UrlGeneratorInterface $urlGenerator,
+        SerializerInterface $serializer, EntityManagerInterface $manager)
         {
             $category=$serializer->deserialize($request->getContent(), Category::class,'json');
             $category ->setCreatedAt();
             $category->setUpdatedAt();
-            $category->setStatus("on");  
+            $category->setStatus("on");
             $manager->persist($category);
             $manager->flush();
             $jsonCategory = $serializer->serialize($category, 'json', ["groups"=> "getCategory"]);
-            $location = $urlGenerator->generate("category.get", ["idCategory"=>$category->getId()], UrlGeneratorInterface::ABSOLUTE_URL);
+            $location = $urlGenerator->generate(
+                "category.get",
+                ["idCategory"=>$category->getId()],
+                UrlGeneratorInterface::ABSOLUTE_URL
+            );
             return new JsonResponse($jsonCategory, JsonResponse::HTTP_CREATED, ["Location"=>$location], true);
         }
 
 
         #[Route('/api/v1/category/{category}', name:"category.update", methods: ['PUT'])]
-        public function updateCategory(Category $updateCategory,Request $request,SerializerInterface $serializer, EntityManagerInterface $manager)
+        public function updateCategory(Category $updateCategory,Request $request,
+        SerializerInterface $serializer, EntityManagerInterface $manager)
         {
-            $updateCategory = $serializer->deserialize($request->getContent(), Category::class,'json',[AbstractNormalizer::OBJECT_TO_POPULATE => $updateCategory]);
+            $updateCategory = $serializer->deserialize(
+                $request->getContent(),
+                Category::class,'json',
+                [AbstractNormalizer::OBJECT_TO_POPULATE => $updateCategory]
+            );
             $updateCategory->setUpdatedAt()->setStatus("on");
             $manager->persist($updateCategory);
             $manager->flush();
@@ -73,7 +83,7 @@ class CategoryController extends AbstractController
         #[ParamConverter('category', options: ['id' => 'categoryId'])]
         public function deleteCategory(Category $category, Bool $isForced, EntityManagerInterface $manager): Response
         {
-            if ($isForced==true) {
+            if ($isForced) {
                 $coffees=$category->getCoffees();
                 foreach($coffees as $coffee) {
                 $category->removeCoffee($coffee);
