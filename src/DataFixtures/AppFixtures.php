@@ -39,8 +39,8 @@ class AppFixtures extends Fixture
                 $ig->setDescription("desc ". $i+$j*5);
                 $createdAt = $this->faker->dateTimeBetween("-1 week","now");
                 $updatedAt = $this->faker->dateTimeBetween($createdAt,"now");
-                $ig->setCreatedAtTo($createdAt);
-                $ig->setUpdatedAtTo($updatedAt);
+                $ig->setCreatedAt($createdAt);
+                $ig->setUpdatedAt($updatedAt);
                 $ig->setStatus("on");
                 $ig->setCategory($category);
                 $manager->persist($ig);

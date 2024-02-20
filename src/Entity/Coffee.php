@@ -62,7 +62,7 @@ class Coffee
         return $this->updatedAt;
     }
 
-    public function setUpdatedAt(?\DateTimeInterface $updatedAt): static
+    public function setUpdatedAt(?\DateTimeInterface $updatedAt = null): static
     {
         $this->updatedAt = $updatedAt != null ? $updatedAt: new \DateTime();
 
@@ -74,7 +74,7 @@ class Coffee
         return $this->createdAt;
     }
 
-    public function setCreatedAt(?\DateTimeInterface $createdAt): static
+    public function setCreatedAt(?\DateTimeInterface $createdAt = null): static
     {
         $this->createdAt = $createdAt != null ? $createdAt: new \DateTime();
 
