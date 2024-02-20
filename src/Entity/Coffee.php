@@ -41,6 +41,9 @@ class Coffee
     #[Groups(["getCoffee"])]
     private ?Category $category = null;
 
+    #[ORM\ManyToOne(inversedBy: 'coffees')]
+    private ?Bean $bean = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -128,6 +131,18 @@ class Coffee
     public function setCategory(?Category $category): static
     {
         $this->category = $category;
+
+        return $this;
+    }
+
+    public function getBean(): ?Bean
+    {
+        return $this->bean;
+    }
+
+    public function setBean(?Bean $bean): static
+    {
+        $this->bean = $bean;
 
         return $this;
     }
