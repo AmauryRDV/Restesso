@@ -78,11 +78,9 @@ class Category
 
     public function removeCoffee(Coffee $coffee): static
     {
-        if ($this->coffees->removeElement($coffee)) {
+        if ($this->coffees->removeElement($coffee) && $coffee->getCategory() === $this) {
             // set the owning side to null (unless already changed)
-            if ($coffee->getCategory() === $this) {
-                $coffee->setCategory(null);
-            }
+            $coffee->setCategory(null);
         }
 
         return $this;
@@ -93,16 +91,9 @@ class Category
         return $this->createdAt;
     }
 
-    public function setCreatedAtTo(\DateTimeInterface $createdAt): static
+    public function setCreatedAt(?\DateTimeInterface $createdAt = null): static
     {
-        $this->createdAt = $createdAt;
-
-        return $this;
-    }
-
-    public function setCreatedAt(): static
-    {
-        $this->createdAt = new \DateTime();
+        $this->createdAt = $createdAt != null ? $createdAt: new \DateTime();
 
         return $this;
     }
@@ -112,16 +103,9 @@ class Category
         return $this->updatedAt;
     }
 
-    public function setUpdatedAtTo(\DateTimeInterface $updatedAt): static
+    public function setUpdatedAt(?\DateTimeInterface $updatedAt = null): static
     {
-        $this->updatedAt = $updatedAt;
-
-        return $this;
-    }
-
-    public function setUpdatedAt(): static
-    {
-        $this->updatedAt = new \DateTime();
+        $this->updatedAt = $updatedAt != null ? $updatedAt: new \DateTime();
 
         return $this;
     }
