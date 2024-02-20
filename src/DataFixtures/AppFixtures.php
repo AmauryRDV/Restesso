@@ -28,8 +28,8 @@ class AppFixtures extends Fixture
             $category->setName("category ". $j);
             $createdAt = $this->faker->dateTimeBetween("-1 week","now");
             $updatedAt = $this->faker->dateTimeBetween($createdAt,"now");
-            $category->setCreatedAt();
-            $category->setUpdatedAt();
+            $category->setCreatedAtTo($createdAt);
+            $category->setUpdatedAtTo($updatedAt);
             $category->setStatus("on");
             $manager->persist($category);
 
@@ -39,8 +39,8 @@ class AppFixtures extends Fixture
                 $ig->setDescription("desc ". $i+$j*5);
                 $createdAt = $this->faker->dateTimeBetween("-1 week","now");
                 $updatedAt = $this->faker->dateTimeBetween($createdAt,"now");
-                $ig->setCreatedAt();
-                $ig->setUpdatedAt();
+                $ig->setCreatedAtTo($createdAt);
+                $ig->setUpdatedAtTo($updatedAt);
                 $ig->setStatus("on");
                 $ig->setCategory($category);
                 $manager->persist($ig);

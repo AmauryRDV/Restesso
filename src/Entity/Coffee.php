@@ -23,11 +23,11 @@ class Coffee
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     #[Groups(["getCoffee"])]
-    private ?\DateTimeInterface $updated_at = null;
+    private ?\DateTimeInterface $updatedAt = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     #[Groups(["getCoffee"])]
-    private ?\DateTimeInterface $created_at = null;
+    private ?\DateTimeInterface $createdAt = null;
 
     #[ORM\Column(length: 255)]
     #[Groups(["getCoffee"])]
@@ -60,38 +60,38 @@ class Coffee
 
     public function getUpdatedAt(): ?\DateTimeInterface
     {
-        return $this->updated_at;
+        return $this->updatedAt;
     }
 
-    public function setUpdatedAtTo(\DateTimeInterface $updated_at): static
+    public function setUpdatedAtTo(\DateTimeInterface $updatedAt): static
     {
-        $this->updated_at = $updated_at;
+        $this->updatedAt = $updatedAt;
 
         return $this;
     }
 
     public function setUpdatedAt(): static
     {
-        $this->updated_at = new DateTime();
+        $this->updatedAt = new DateTime();
 
         return $this;
     }
 
     public function getCreatedAt(): ?\DateTimeInterface
     {
-        return $this->created_at;
+        return $this->createdAt;
     }
 
     public function setCreatedAt(): static
     {
-        $this->created_at = new DateTime();
+        $this->createdAt = new DateTime();
 
         return $this;
     }
 
-    public function setCreatedAtTo(\DateTimeInterface $created_at): static
+    public function setCreatedAtTo(\DateTimeInterface $createdAt): static
     {
-        $this->created_at = $created_at;
+        $this->createdAt = $createdAt;
 
         return $this;
     }

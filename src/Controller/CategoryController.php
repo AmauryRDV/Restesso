@@ -27,15 +27,15 @@ class CategoryController extends AbstractController
         ]);
     }
 
-        #[Route('/api/category', name:"category.getAll", methods: ['GET'])]
+        #[Route('/api/v1/categories', name:"category.getAll", methods: ['GET'])]
         public function getAllCategories(CategoryRepository $categoryRep, SerializerInterface $serializer)
         {
             $categories = $categoryRep->findAll();
-            $jsonCategories = $serializer->serialize($categories, 'json', ["groups"=> "getAllCategories"]);
-            return new JsonResponse($jsonCategories, 200, [], true);
+            $jsonCategories = $serializer->serialize($categories, 'json', ['groups'=> "getAllCategories"]);
+            return new JsonResponse($jsonCategories, Response::HTTP_OK, [], true);
         }
 
-        #[Route('/api/category/{idCategory}', name:"category.get", methods: ['GET'])]
+        #[Route('/api/v1/category/{idCategory}', name:"category.get", methods: ['GET'])]
         #[ParamConverter("category", options:["id"=>"idCategory"])]
         public function getCategory(Category $category, SerializerInterface $serializer): JsonResponse
         {
@@ -43,7 +43,7 @@ class CategoryController extends AbstractController
             return new JsonResponse($jsonCategory, 200, [], true);
         }
 
-        #[Route('/api/category', name:"category.create", methods: ['POST'])]
+        #[Route('/api/v1/category', name:"category.create", methods: ['POST'])]
         public function createCategory(Request $request,UrlGeneratorInterface $urlGenerator,SerializerInterface $serializer, EntityManagerInterface $manager)
         {
             $category=$serializer->deserialize($request->getContent(), Category::class,'json');
@@ -58,7 +58,7 @@ class CategoryController extends AbstractController
         }
 
 
-        #[Route('/api/category/{category}', name:"category.update", methods: ['PUT'])]
+        #[Route('/api/v1/category/{category}', name:"category.update", methods: ['PUT'])]
         public function updateCategory(Category $updateCategory,Request $request,SerializerInterface $serializer, EntityManagerInterface $manager)
         {
             $updateCategory = $serializer->deserialize($request->getContent(), Category::class,'json',[AbstractNormalizer::OBJECT_TO_POPULATE => $updateCategory]);
@@ -69,7 +69,7 @@ class CategoryController extends AbstractController
         }
     
 
-        #[Route('/api/category/{categoryId}/{isForced}', name:'category.delete', methods: ['DELETE'])]
+        #[Route('/api/v1/category/{categoryId}/{isForced}', name:'category.delete', methods: ['DELETE'])]
         #[ParamConverter('category', options: ['id' => 'categoryId'])]
         public function deleteCategory(Category $category, Bool $isForced, EntityManagerInterface $manager): Response
         {

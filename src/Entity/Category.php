@@ -15,8 +15,7 @@ class Category
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(["getCoffee"])]
-    #[Groups(["getAllCategories"])]
+    #[Groups(["getCoffee", "getAllCategories"])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
@@ -27,10 +26,12 @@ class Category
     private Collection $coffees;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    private ?\DateTimeInterface $create_at = null;
+    #[Groups(["getAllCategories"])]
+    private ?\DateTimeInterface $createdAt = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    private ?\DateTimeInterface $updated_at = null;
+    #[Groups(["getAllCategories"])]
+    private ?\DateTimeInterface $updatedAt = null;
 
     #[ORM\Column(length: 255)]
     private ?string $status = null;
@@ -87,40 +88,40 @@ class Category
         return $this;
     }
 
-    public function getCreateAt(): ?\DateTimeInterface
+    public function getCreatedAt(): ?\DateTimeInterface
     {
-        return $this->create_at;
+        return $this->createdAt;
     }
 
-    public function setCreatedAtTo(\DateTimeInterface $create_at): static
+    public function setCreatedAtTo(\DateTimeInterface $createdAt): static
     {
-        $this->create_at = $create_at;
+        $this->createdAt = $createdAt;
 
         return $this;
     }
 
     public function setCreatedAt(): static
     {
-        $this->create_at = new \DateTime();
+        $this->createdAt = new \DateTime();
 
         return $this;
     }
 
     public function getUpdatedAt(): ?\DateTimeInterface
     {
-        return $this->updated_at;
+        return $this->updatedAt;
     }
 
-    public function setUpdatedAtTo(\DateTimeInterface $updated_at): static
+    public function setUpdatedAtTo(\DateTimeInterface $updatedAt): static
     {
-        $this->updated_at = $updated_at;
+        $this->updatedAt = $updatedAt;
 
         return $this;
     }
 
     public function setUpdatedAt(): static
     {
-        $this->updated_at = new \DateTime();
+        $this->updatedAt = new \DateTime();
 
         return $this;
     }
