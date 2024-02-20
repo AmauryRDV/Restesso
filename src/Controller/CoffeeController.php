@@ -14,6 +14,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class CoffeeController extends AbstractController
 {
@@ -48,14 +49,19 @@ class CoffeeController extends AbstractController
 
     #[Route('/api/v1/coffee', name:'coffee.create', methods: ['POST'])]
     public function createCoffee(Request $request, UrlGeneratorInterface $urlGeneratorInterface,
-    SerializerInterface $serializerInterface, EntityManagerInterface $manager): JsonResponse
+    SerializerInterface $serializerInterface, EntityManagerInterface $manager,
+    ValidatorInterface $validatorInterface): JsonResponse
     {
         $coffee = $serializerInterface->deserialize($request->getContent(), Coffee::class, 'json');
-
         // mettre à jour l'objet coffee pour mettre la date de création, d'update et le status
         $coffee->setCreatedAt();
         $coffee->setUpdatedAt();
         $coffee->setStatus('on');
+
+        $errors = $validatorInterface->validate($coffee);
+        if (count($errors) > 0) {
+            return new JsonResponse($serializerInterface->serialize($errors, 'json'), JsonResponse::HTTP_BAD_REQUEST);
+        }
 
         $manager->persist($coffee);
         $manager->flush();
