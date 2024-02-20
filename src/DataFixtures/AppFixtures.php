@@ -28,8 +28,8 @@ class AppFixtures extends Fixture
             $category->setName("category ". $j);
             $createdAt = $this->faker->dateTimeBetween("-1 week","now");
             $updatedAt = $this->faker->dateTimeBetween($createdAt,"now");
-            $category->setCreatedAtTo($createdAt);
-            $category->setUpdatedAtTo($updatedAt);
+            $category->setCreatedAt($createdAt);
+            $category->setUpdatedAt($updatedAt);
             $category->setStatus("on");
             $manager->persist($category);
 

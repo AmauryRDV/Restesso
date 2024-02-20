@@ -3,7 +3,6 @@
 namespace App\Entity;
 
 use App\Repository\CoffeeRepository;
-use DateTime;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
@@ -63,16 +62,9 @@ class Coffee
         return $this->updatedAt;
     }
 
-    public function setUpdatedAtTo(\DateTimeInterface $updatedAt): static
+    public function setUpdatedAt(?\DateTimeInterface $updatedAt): static
     {
-        $this->updatedAt = $updatedAt;
-
-        return $this;
-    }
-
-    public function setUpdatedAt(): static
-    {
-        $this->updatedAt = new DateTime();
+        $this->updatedAt = $updatedAt != null ? $updatedAt: new \DateTime();
 
         return $this;
     }
@@ -82,16 +74,9 @@ class Coffee
         return $this->createdAt;
     }
 
-    public function setCreatedAt(): static
+    public function setCreatedAt(?\DateTimeInterface $createdAt): static
     {
-        $this->createdAt = new DateTime();
-
-        return $this;
-    }
-
-    public function setCreatedAtTo(\DateTimeInterface $createdAt): static
-    {
-        $this->createdAt = $createdAt;
+        $this->createdAt = $createdAt != null ? $createdAt: new \DateTime();
 
         return $this;
     }
