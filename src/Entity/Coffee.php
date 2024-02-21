@@ -9,7 +9,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: CoffeeRepository::class)]
-class Coffee
+class Coffee extends SoftDeleteFields
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -27,24 +27,12 @@ class Coffee
     )]
     private ?string $name = null;
 
-    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    #[Groups(["getCoffee"])]
-    private ?\DateTimeInterface $updatedAt = null;
-
-    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    #[Groups(["getCoffee"])]
-    private ?\DateTimeInterface $createdAt = null;
-
-    #[ORM\Column(length: 255)]
-    #[Groups(["getCoffee"])]
-    private ?string $status = null;
-
     #[ORM\Column(type: Types::TEXT)]
-    #[Groups(["getCoffee"])]
+    #[Groups(['getCoffee'])]
     private ?string $description = null;
 
-    #[ORM\ManyToOne(inversedBy: '   ')]
-    #[Groups(["getCoffee"])]
+    #[ORM\ManyToOne(inversedBy: 'coffees')]
+    #[Groups(['getCoffee'])]
     private ?Category $category = null;
 
     #[ORM\ManyToOne(inversedBy: 'coffees')]
@@ -66,42 +54,6 @@ class Coffee
     public function setName(string $name): static
     {
         $this->name = $name;
-
-        return $this;
-    }
-
-    public function getUpdatedAt(): ?\DateTimeInterface
-    {
-        return $this->updatedAt;
-    }
-
-    public function setUpdatedAt(?\DateTimeInterface $updatedAt = null): static
-    {
-        $this->updatedAt = $updatedAt != null ? $updatedAt: new \DateTime();
-
-        return $this;
-    }
-
-    public function getCreatedAt(): ?\DateTimeInterface
-    {
-        return $this->createdAt;
-    }
-
-    public function setCreatedAt(?\DateTimeInterface $createdAt = null): static
-    {
-        $this->createdAt = $createdAt != null ? $createdAt: new \DateTime();
-
-        return $this;
-    }
-
-    public function getStatus(): ?string
-    {
-        return $this->status;
-    }
-
-    public function setStatus(string $status): static
-    {
-        $this->status = $status;
 
         return $this;
     }

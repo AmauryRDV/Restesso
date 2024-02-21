@@ -11,7 +11,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: CategoryRepository::class)]
-class Category
+class Category extends SoftDeleteFields
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -37,17 +37,6 @@ class Category
         orphanRemoval: true
     )]
     private Collection $coffees;
-
-    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    #[Groups(["getCategory"])]
-    private ?\DateTimeInterface $createdAt = null;
-
-    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    #[Groups(["getCategory"])]
-    private ?\DateTimeInterface $updatedAt = null;
-
-    #[ORM\Column(length: 255)]
-    private ?string $status = null;
 
     public function __construct()
     {
@@ -95,42 +84,6 @@ class Category
             // set the owning side to null (unless already changed)
             $coffee->setCategory(null);
         }
-
-        return $this;
-    }
-
-    public function getCreatedAt(): ?\DateTimeInterface
-    {
-        return $this->createdAt;
-    }
-
-    public function setCreatedAt(?\DateTimeInterface $createdAt = null): static
-    {
-        $this->createdAt = $createdAt != null ? $createdAt: new \DateTime();
-
-        return $this;
-    }
-
-    public function getUpdatedAt(): ?\DateTimeInterface
-    {
-        return $this->updatedAt;
-    }
-
-    public function setUpdatedAt(?\DateTimeInterface $updatedAt = null): static
-    {
-        $this->updatedAt = $updatedAt != null ? $updatedAt: new \DateTime();
-
-        return $this;
-    }
-
-    public function getStatus(): ?string
-    {
-        return $this->status;
-    }
-
-    public function setStatus(string $status): static
-    {
-        $this->status = $status;
 
         return $this;
     }

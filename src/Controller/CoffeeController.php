@@ -21,16 +21,7 @@ use Symfony\Contracts\Cache\TagAwareCacheInterface;
 
 class CoffeeController extends AbstractController
 {
-    private const COFFEE_COFFEEID_URL = '/api/v1/coffee/{coffeeId}';
-
-    #[Route('/coffee', name: 'app_coffee')]
-    public function index(): JsonResponse
-    {
-        return $this->json([
-            'message' => 'Welcome to your new controller!',
-            'path' => 'src/Controller/CoffeeController.php',
-        ]);
-    }
+    private const COFFEE_COFFEEID_URL = '/api/v1/coffee/{id}';
 
     #[Route('/api/v1/coffees', name:'coffee.getAll', methods: ['GET'])]
     public function getAllCoffees(CoffeeRepository $coffeeRepository,
@@ -52,7 +43,6 @@ class CoffeeController extends AbstractController
     }
 
     #[Route(CoffeeController::COFFEE_COFFEEID_URL, name:'coffee.get', methods: ['GET'])]
-    #[ParamConverter('coffee', options: ['id' => 'coffeeId'])]
     public function getCoffee(Coffee $coffee, SerializerInterface $serializerInterface): JsonResponse
     {
         $jsonCoffee = $serializerInterface->serialize($coffee, 'json', ['groups' => 'getCoffee']);
@@ -91,7 +81,6 @@ class CoffeeController extends AbstractController
     }
 
     #[Route(CoffeeController::COFFEE_COFFEEID_URL, name:'coffee.update', methods: ['PUT'])]
-    #[ParamConverter('coffee', options: ['id' => 'coffeeId'])]
     public function updateCoffee(Coffee $coffee, Request $request, SerializerInterface $serializerInterface,
     EntityManagerInterface $manager): JsonResponse
     {
@@ -113,7 +102,6 @@ class CoffeeController extends AbstractController
     }
 
     #[Route(CoffeeController::COFFEE_COFFEEID_URL . '/{isForced}', name:'coffee.delete', methods: ['DELETE'])]
-    #[ParamConverter('coffee', options: ['id' => 'coffeeId'])]
     public function deleteCoffeeIsForced(Coffee $coffee, Bool $isForced, EntityManagerInterface $manager): Response
     {
         if ($isForced) {
@@ -130,7 +118,6 @@ class CoffeeController extends AbstractController
     }
 
     #[Route(CoffeeController::COFFEE_COFFEEID_URL, name:'coffee.delete', methods: ['DELETE'])]
-    #[ParamConverter('coffee', options: ['id' => 'coffeeId'])]
     public function deleteCoffee(Coffee $coffee, EntityManagerInterface $manager): Response
     {
         $coffee->setStatus('off');
