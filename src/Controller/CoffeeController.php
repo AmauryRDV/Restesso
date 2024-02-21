@@ -14,10 +14,12 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Contracts\Cache\ItemInterface;
+use Symfony\Contracts\Cache\TagAwareCacheInterface;
 
 class CoffeeController extends AbstractController
 {
-
     private const COFFEE_COFFEEID_URL = '/api/v1/coffee/{coffeeId}';
 
     #[Route('/coffee', name: 'app_coffee')]
@@ -31,8 +33,18 @@ class CoffeeController extends AbstractController
 
     #[Route('/api/v1/coffees', name:'coffee.getAll', methods: ['GET'])]
     public function getAllCoffees(CoffeeRepository $coffeeRepository,
-    SerializerInterface $serializerInterface): JsonResponse
+    SerializerInterface $serializerInterface, TagAwareCacheInterface $tagAwareCacheInterface): JsonResponse
     {
+        $idCache = 'getAllCoffeesCache';
+
+        $tagAwareCacheInterface->get($idCache,
+            function (ItemInterface $itemInterface) use ($coffeeRepository, $serializerInterface) {
+                $itemInterface->tag(['coffeesCache']);
+                $coffees = $coffeeRepository->findAllActive();
+                return $serializerInterface->serialize($coffees, 'json', ['groups' => 'getCoffee']);
+            }
+        );
+
         $coffees = $coffeeRepository->findAllActive();
         $jsonCoffees = $serializerInterface->serialize($coffees, 'json', ['groups' => 'getCoffee']);
         return new JsonResponse($jsonCoffees, JsonResponse::HTTP_OK, [], true);
@@ -48,17 +60,24 @@ class CoffeeController extends AbstractController
 
     #[Route('/api/v1/coffee', name:'coffee.create', methods: ['POST'])]
     public function createCoffee(Request $request, UrlGeneratorInterface $urlGeneratorInterface,
-    SerializerInterface $serializerInterface, EntityManagerInterface $manager): JsonResponse
+    SerializerInterface $serializerInterface, EntityManagerInterface $manager,
+    ValidatorInterface $validatorInterface, TagAwareCacheInterface $tagAwareCacheInterface): JsonResponse
     {
         $coffee = $serializerInterface->deserialize($request->getContent(), Coffee::class, 'json');
-
         // mettre à jour l'objet coffee pour mettre la date de création, d'update et le status
         $coffee->setCreatedAt();
         $coffee->setUpdatedAt();
         $coffee->setStatus('on');
 
+        $errors = $validatorInterface->validate($coffee);
+        if (count($errors) > 0) {
+            return new JsonResponse($serializerInterface->serialize($errors, 'json'), JsonResponse::HTTP_BAD_REQUEST);
+        }
+
         $manager->persist($coffee);
         $manager->flush();
+
+        $tagAwareCacheInterface->invalidateTags(['coffeesCache']);
 
         $jsonCoffee = $serializerInterface->serialize($coffee, 'json', ['groups' => 'getCoffee']);
         $location = $urlGeneratorInterface->generate(

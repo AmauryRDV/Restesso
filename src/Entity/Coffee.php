@@ -6,6 +6,7 @@ use App\Repository\CoffeeRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: CoffeeRepository::class)]
 class Coffee
@@ -18,6 +19,12 @@ class Coffee
 
     #[ORM\Column(length: 255)]
     #[Groups(["getCoffee"])]
+    #[Assert\Length(
+        min: 3,
+        max: 255,
+        minMessage: "The name must be at least {{ limit }} characters long",
+        maxMessage: "The name cannot be longer than {{ limit }} characters"
+    )]
     private ?string $name = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
@@ -39,6 +46,9 @@ class Coffee
     #[ORM\ManyToOne(inversedBy: 'coffees')]
     #[Groups(["getCoffee"])]
     private ?Category $category = null;
+
+    #[ORM\ManyToOne(inversedBy: 'coffees')]
+    private ?Taste $taste = null;
 
     #[ORM\ManyToOne(inversedBy: 'coffees')]
     private ?Bean $bean = null;
@@ -116,6 +126,18 @@ class Coffee
     public function setCategory(?Category $category): static
     {
         $this->category = $category;
+
+        return $this;
+    }
+
+    public function getTaste(): ?Taste
+    {
+        return $this->taste;
+    }
+
+    public function setTaste(?Taste $taste): static
+    {
+        $this->taste = $taste;
 
         return $this;
     }
