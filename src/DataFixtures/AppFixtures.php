@@ -2,6 +2,7 @@
 
 namespace App\DataFixtures;
 
+use App\Entity\Bean;
 use App\Entity\Category;
 use App\Entity\Coffee;
 use Doctrine\Bundle\FixturesBundle\Fixture;
@@ -32,6 +33,11 @@ class AppFixtures extends Fixture
             $category->setUpdatedAt($updatedAt);
             $category->setStatus("on");
             $manager->persist($category);
+            $bean = new Bean();
+            $bean->setName("Bean ". $j);
+            $bean->setOrigin("Pays ". $j);
+            $bean->setDescription("Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas in.". $j);
+            $manager->persist($bean);
 
             for ($i = 0; $i < 5; $i++) {
                 $ig = new Coffee();
@@ -43,6 +49,7 @@ class AppFixtures extends Fixture
                 $ig->setUpdatedAt($updatedAt);
                 $ig->setStatus("on");
                 $ig->setCategory($category);
+                $ig->setBean($bean);
                 $manager->persist($ig);
             }
         }

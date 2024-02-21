@@ -8,6 +8,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: CategoryRepository::class)]
 class Category
@@ -15,11 +16,18 @@ class Category
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(["getCoffee", "getAllCategories"])]
+    #[Groups(["getCoffee", "getCategory"])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(["getAllCategories"])]
+    #[Groups(["getCategory"])]
+    #[Assert\Length(
+        min : 2,
+        max : 100,
+        minMessage : 'The name must be at least {{ limit }} characters long',
+        maxMessage: 'The name cannot be longer than {{ limit }} characters',
+
+    )]
     private ?string $name = null;
 
     #[ORM\OneToMany(
@@ -31,11 +39,11 @@ class Category
     private Collection $coffees;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    #[Groups(["getAllCategories"])]
+    #[Groups(["getCategory"])]
     private ?\DateTimeInterface $createdAt = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    #[Groups(["getAllCategories"])]
+    #[Groups(["getCategory"])]
     private ?\DateTimeInterface $updatedAt = null;
 
     #[ORM\Column(length: 255)]

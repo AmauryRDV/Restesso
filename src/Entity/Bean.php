@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: BeanRepository::class)]
 class Bean
@@ -14,15 +15,21 @@ class Bean
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(["getCoffee", "getBean"])]
+
     private ?int $id = null;
 
     #[ORM\Column(length: 100)]
+    #[Groups(["getCoffee", "getBean"])]
     private ?string $name = null;
 
     #[ORM\Column(length: 200, nullable: true)]
+    #[Groups(["getCoffee", "getBean"])]
     private ?string $origin = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Groups(["getCoffee", "getBean"])]
+
     private ?string $description = null;
 
     #[ORM\OneToMany(
@@ -78,6 +85,10 @@ class Bean
 
         return $this;
     }
+
+
+    
+    
 
     /**
      * @return Collection<int, Coffee>
