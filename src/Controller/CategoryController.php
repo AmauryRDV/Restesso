@@ -17,6 +17,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Contracts\Cache\ItemInterface;
 use Symfony\Contracts\Cache\TagAwareCacheInterface;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 
 class CategoryController extends AbstractController
 {
@@ -46,6 +47,7 @@ class CategoryController extends AbstractController
     }
 
     #[Route('/api/v1/category', name:"category.create", methods: ['POST'])]
+    #[IsGranted('ROLE_ADMIN', statusCode: 423)]
     public function createCategory(Request $request,TagAwareCacheInterface $cache,ValidatorInterface $validator,
     UrlGeneratorInterface $urlGenerator,SerializerInterface $serializer, EntityManagerInterface $manager): JsonResponse
     {
@@ -75,8 +77,9 @@ class CategoryController extends AbstractController
     }
 
 
-    #[Route('/api/v1/category/{category}', name:"category.update", methods: ['PUT'])]
-    public function updateCategory(Category $updateCategory,ValidatorInterface $validator,Request $request,
+    #[Route('/api/v1/category/{id}', name:"category.update", methods: ['PUT'])]
+    #[IsGranted('ROLE_ADMIN', statusCode: 423)]
+    public function updateCategory(Category $updateCategory,TagAwareCacheInterface $cache,ValidatorInterface $validator,Request $request,
     SerializerInterface $serializer, EntityManagerInterface $manager)
     {
         $updateCategory = $serializer->deserialize(
@@ -96,13 +99,14 @@ class CategoryController extends AbstractController
             }
         $manager->persist($updateCategory);
         $manager->flush();
-        
+        $cache->invalidateTags(['categoryCache']);
         return new JsonResponse(null, JsonResponse::HTTP_NO_CONTENT);
     }
 
 
     #[Route('/api/v1/category/{categoryId}/{isForced}', name:'category.delete', methods: ['DELETE'])]
     #[ParamConverter('category', options: ['id' => 'categoryId'])]
+    #[IsGranted('ROLE_ADMIN', statusCode: 423)]
     public function deleteCategory(Category $category, Bool $isForced, EntityManagerInterface $manager): Response
     {
         if ($isForced) {
