@@ -38,7 +38,7 @@ class CategoryController extends AbstractController
                 {
                     $item->tag("categoryCache");
                     $categories = $categoryRep->findAll();
-                    return  $serializer->serialize($categories, 'json', ['groups'=> "getAllCategories"]);
+                    return  $serializer->serialize($categories, 'json', ['groups'=> "getCategory"]);
                 }
             );
         
@@ -49,7 +49,7 @@ class CategoryController extends AbstractController
         #[ParamConverter("category", options:["id"=>"idCategory"])]
         public function getCategory(Category $category, SerializerInterface $serializer): JsonResponse
         {
-            $jsonCategory = $serializer->serialize($category, 'json', ['groups'=> 'getAllCategories']);
+            $jsonCategory = $serializer->serialize($category, 'json', ['groups'=> 'getCategory']);
             return new JsonResponse($jsonCategory, 200, [], true);
         }
 
