@@ -5,10 +5,12 @@ namespace App\DataFixtures;
 use App\Entity\Bean;
 use App\Entity\Category;
 use App\Entity\Coffee;
+use App\Entity\User;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 use Faker\Factory;
 use Faker\Generator;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class AppFixtures extends Fixture
 {
@@ -18,42 +20,48 @@ class AppFixtures extends Fixture
      */
     private Generator $faker;
 
-    public function __construct() {
+    /**
+     * Password Hasher
+     * @var UserPasswordHasherInterface $passwordEncoder
+    */
+    private UserPasswordHasherInterface $passwordHasher;
+
+    public function __construct(UserPasswordHasherInterface $passwordEncoder) {
         $this->faker = Factory::create("fr_FR");
+        $this->passwordHasher = $passwordEncoder;
     }
 
     public function load(ObjectManager $manager): void
     {
-        for ($j=0; $j < 20; $j++) {
-            $category = new Category();
-            $category->setName("category ". $j);
-            $createdAt = $this->faker->dateTimeBetween("-1 week","now");
-            $updatedAt = $this->faker->dateTimeBetween($createdAt,"now");
-            $category->setCreatedAt($createdAt);
-            $category->setUpdatedAt($updatedAt);
-            $category->setStatus("on");
-            $manager->persist($category);
-            $bean = new Bean();
-            $bean->setName("Bean ". $j);
-            $bean->setOrigin("Pays ". $j);
-            $bean->setDescription("Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas in.". $j);
-            $manager->persist($bean);
+        // Public
+        $publicUser = new User();
+        $pwd = $this->faker->password(2, 6);
+        $publicUser
+            ->setUsername($this->faker->userName() . '@' . $pwd)
+            ->setPassword($this->passwordHasher->hashPassword($publicUser, $pwd))
+            ->setRoles(['ROLE_PUBLIC']);
 
-            for ($i = 0; $i < 5; $i++) {
-                $ig = new Coffee();
-                $ig->setName("coffee ". $i+$j*5);
-                $ig->setDescription("desc ". $i+$j*5);
-                $createdAt = $this->faker->dateTimeBetween("-1 week","now");
-                $updatedAt = $this->faker->dateTimeBetween($createdAt,"now");
-                $ig->setCreatedAt($createdAt);
-                $ig->setUpdatedAt($updatedAt);
-                $ig->setStatus("on");
-                $ig->setCategory($category);
-                $ig->setBean($bean);
-                $manager->persist($ig);
-            }
+        $manager->persist($publicUser);
+
+        // User
+        for ($i=0; $i < 10; $i++) {
+            $userUser = new User();
+            $pwd = $this->faker->password(2, 6);
+            $userUser
+                ->setUsername($this->faker->userName() . '@' . $pwd)
+                ->setPassword($this->passwordHasher->hashPassword($userUser, $pwd))
+                ->setRoles(['ROLE_USER']);
+    
+            $manager->persist($userUser);
         }
 
+        $adminUser = new User();
+        $adminUser
+            ->setUsername('admin')
+            ->setPassword($this->passwordHasher->hashPassword($adminUser, 'password'))
+            ->setRoles(['ROLE_ADMIN']);
+
+        $manager->persist($adminUser);
         $manager->flush();
     }
 }

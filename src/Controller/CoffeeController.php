@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Coffee;
 use App\Repository\CoffeeRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -59,6 +60,7 @@ class CoffeeController extends AbstractController
     }
 
     #[Route('/api/v1/coffee', name:'coffee.create', methods: ['POST'])]
+    #[IsGranted('ROLE_ADMIN', statusCode: 403)]
     public function createCoffee(Request $request, UrlGeneratorInterface $urlGeneratorInterface,
     SerializerInterface $serializerInterface, EntityManagerInterface $manager,
     ValidatorInterface $validatorInterface, TagAwareCacheInterface $tagAwareCacheInterface): JsonResponse
