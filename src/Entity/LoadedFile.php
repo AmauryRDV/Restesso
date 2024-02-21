@@ -9,7 +9,7 @@ use Vich\UploaderBundle\Mapping\Annotation as Vich;
 use Symfony\Component\HttpFoundation\File\File;
 
 #[ORM\Entity(repositoryClass: LoadedFileRepository::class)]
-class LoadedFile
+class LoadedFile extends SoftDeleteFields
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -27,15 +27,6 @@ class LoadedFile
 
     #[ORM\Column(length: 255)]
     private ?string $mimeType = null;
-
-    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    private ?\DateTimeInterface $updatedAt = null;
-
-    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    private ?\DateTimeInterface $createdAt = null;
-
-    #[ORM\Column(length: 255)]
-    private ?string $status = null;
 
     #[Vich\UploadableField(mapping:'pictures', fileNameProperty:'realPath')]
     private $file;
@@ -92,42 +83,6 @@ class LoadedFile
     public function setMimeType(string $mimeType): static
     {
         $this->mimeType = $mimeType;
-
-        return $this;
-    }
-
-    public function getUpdatedAt(): ?\DateTimeInterface
-    {
-        return $this->updatedAt;
-    }
-
-    public function setUpdatedAt(?\DateTimeInterface $updatedAt = null): static
-    {
-        $this->updatedAt = $updatedAt != null ? $updatedAt: new \DateTime();
-
-        return $this;
-    }
-
-    public function getCreatedAt(): ?\DateTimeInterface
-    {
-        return $this->createdAt;
-    }
-
-    public function setCreatedAt(?\DateTimeInterface $createdAt = null): static
-    {
-        $this->createdAt = $createdAt != null ? $createdAt: new \DateTime();
-
-        return $this;
-    }
-
-    public function getStatus(): ?string
-    {
-        return $this->status;
-    }
-
-    public function setStatus(string $status): static
-    {
-        $this->status = $status;
 
         return $this;
     }

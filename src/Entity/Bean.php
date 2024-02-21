@@ -10,7 +10,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: BeanRepository::class)]
-class Bean
+class Bean extends SoftDeleteFields
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]

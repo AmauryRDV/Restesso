@@ -7,24 +7,25 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
+#[ORM\MappedSuperclass]
 abstract class SoftDeleteFields
 {
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     #[Assert\NotNull]
-    #[Groups(['getCoffee', 'getCategory'])]
+    #[Groups(['getCoffee', 'getCategory', 'getBean', 'getLoadedFile', 'getTaste'])]
     private ?\DateTimeInterface $createdAt = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     #[Assert\NotNull]
-    #[Groups(['getCoffee', 'getCategory'])]
+    #[Groups(['getCoffee', 'getCategory', 'getBean', 'getLoadedFile', 'getTaste'])]
     private ?\DateTimeInterface $updatedAt = null;
 
-    #[ORM\Column(length: 15)]
+    #[ORM\Column(length: 10)]
     #[Assert\Choice(choices: ['active', 'inactive'])]
-    #[Groups(['getCoffee', 'getCategory'])]
+    #[Groups(['getCoffee', 'getCategory', 'getBean', 'getLoadedFile', 'getTaste'])]
     private ?string $status = null;
 
-
+    
     public function getCreatedAt(): ?\DateTimeInterface
     {
         return $this->createdAt;
