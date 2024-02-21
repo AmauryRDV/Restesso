@@ -74,6 +74,10 @@ class Bean
         return $this;
     }
 
+
+    
+    
+
     /**
      * @return Collection<int, Coffee>
      */

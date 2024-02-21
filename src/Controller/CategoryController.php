@@ -14,6 +14,9 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Contracts\Cache\ItemInterface;
+use Symfony\Contracts\Cache\TagAwareCacheInterface;
 
 class CategoryController extends AbstractController
 {
@@ -28,10 +31,17 @@ class CategoryController extends AbstractController
     }
 
         #[Route('/api/v1/categories', name:"category.getAll", methods: ['GET'])]
-        public function getAllCategories(CategoryRepository $categoryRep, SerializerInterface $serializer)
+        public function getAllCategories(CategoryRepository $categoryRep, SerializerInterface $serializer, TagAwareCacheInterface $cache)
         {
-            $categories = $categoryRep->findAll();
-            $jsonCategories = $serializer->serialize($categories, 'json', ['groups'=> "getAllCategories"]);
+            $idCacheGetAllCategories = "getAllCategoriesCache";
+                $jsonCategories = $cache->get($idCacheGetAllCategories, function (ItemInterface $item) use ($categoryRep, $serializer) 
+                {
+                    $item->tag("categoryCache");
+                    $categories = $categoryRep->findAll();
+                    return  $serializer->serialize($categories, 'json', ['groups'=> "getAllCategories"]);
+                }
+            );
+        
             return new JsonResponse($jsonCategories, Response::HTTP_OK, [], true);
         }
 
@@ -44,15 +54,21 @@ class CategoryController extends AbstractController
         }
 
         #[Route('/api/v1/category', name:"category.create", methods: ['POST'])]
-        public function createCategory(Request $request,UrlGeneratorInterface $urlGenerator,
+        public function createCategory(Request $request,TagAwareCacheInterface $cache,ValidatorInterface $validator,UrlGeneratorInterface $urlGenerator,
         SerializerInterface $serializer, EntityManagerInterface $manager)
         {
             $category=$serializer->deserialize($request->getContent(), Category::class,'json');
             $category ->setCreatedAt();
             $category->setUpdatedAt();
             $category->setStatus("on");
+            $errors = $validator->validate($category);
+            if ($errors->count())
+            {
+                return new JsonResponse($serializer->serialize($errors,'json'),JsonResponse::HTTP_BAD_REQUEST, [], true);
+            }
             $manager->persist($category);
             $manager->flush();
+            $cache->invalidateTags(['categoryCache']);
             $jsonCategory = $serializer->serialize($category, 'json', ["groups"=> "getCategory"]);
             $location = $urlGenerator->generate(
                 "category.get",
@@ -64,7 +80,7 @@ class CategoryController extends AbstractController
 
 
         #[Route('/api/v1/category/{category}', name:"category.update", methods: ['PUT'])]
-        public function updateCategory(Category $updateCategory,Request $request,
+        public function updateCategory(Category $updateCategory,ValidatorInterface $validator,Request $request,
         SerializerInterface $serializer, EntityManagerInterface $manager)
         {
             $updateCategory = $serializer->deserialize(
@@ -73,6 +89,11 @@ class CategoryController extends AbstractController
                 [AbstractNormalizer::OBJECT_TO_POPULATE => $updateCategory]
             );
             $updateCategory->setUpdatedAt()->setStatus("on");
+            $errors = $validator->validate($updateCategory);
+            if ($errors->count())
+            {
+                return new JsonResponse($serializer->serialize($errors,'json'),JsonResponse::HTTP_BAD_REQUEST, [], true);
+            }
             $manager->persist($updateCategory);
             $manager->flush();
             return new JsonResponse(null, JsonResponse::HTTP_NO_CONTENT);
