@@ -25,7 +25,12 @@ class Bean
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $description = null;
 
-    #[ORM\OneToMany(mappedBy: 'bean', targetEntity: Coffee::class)]
+    #[ORM\OneToMany(
+        mappedBy: 'bean',
+        targetEntity: Coffee::class,
+        cascade: ['persist', 'remove'],
+        orphanRemoval: true
+    )]
     private Collection $coffees;
 
     public function __construct()
@@ -94,11 +99,9 @@ class Bean
 
     public function removeCoffee(Coffee $coffee): static
     {
-        if ($this->coffees->removeElement($coffee)) {
+        if ($this->coffees->removeElement($coffee) && $coffee->getBean() === $this) {
             // set the owning side to null (unless already changed)
-            if ($coffee->getBean() === $this) {
-                $coffee->setBean(null);
-            }
+            $coffee->setBean(null);
         }
 
         return $this;

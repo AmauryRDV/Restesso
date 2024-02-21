@@ -22,7 +22,12 @@ class Category
     #[Groups(["getAllCategories"])]
     private ?string $name = null;
 
-    #[ORM\OneToMany(mappedBy: 'category', targetEntity: Coffee::class)]
+    #[ORM\OneToMany(
+        mappedBy: 'category',
+        targetEntity: Coffee::class,
+        cascade: ['persist', 'remove'],
+        orphanRemoval: true
+    )]
     private Collection $coffees;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
