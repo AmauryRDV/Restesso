@@ -28,7 +28,12 @@ class Taste
     #[ORM\Column]
     private ?float $caffeineRate = null;
 
-    #[ORM\OneToMany(mappedBy: 'taste', targetEntity: Coffee::class)]
+    #[ORM\OneToMany(
+        mappedBy: 'taste',
+        targetEntity: Coffee::class,
+        cascade: ['persist', 'remove'],
+        orphanRemoval: true
+    )]
     private Collection $coffees;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]

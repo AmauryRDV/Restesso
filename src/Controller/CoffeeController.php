@@ -135,6 +135,7 @@ class CoffeeController extends AbstractController
         $coffee->setUpdatedAt();
         $manager->persist($coffee);
         $manager->flush();
+        
         return new Response(null, JsonResponse::HTTP_NO_CONTENT);
     }
 }

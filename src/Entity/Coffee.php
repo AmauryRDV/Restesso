@@ -43,7 +43,7 @@ class Coffee
     #[Groups(["getCoffee"])]
     private ?string $description = null;
 
-    #[ORM\ManyToOne(inversedBy: 'coffees')]
+    #[ORM\ManyToOne(inversedBy: '   ')]
     #[Groups(["getCoffee"])]
     private ?Category $category = null;
 
