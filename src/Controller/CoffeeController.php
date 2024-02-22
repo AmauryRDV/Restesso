@@ -30,6 +30,7 @@ class CoffeeController extends AbstractController
     public function getAllCoffees(CoffeeRepository $coffeeRepository, SerializerInterface $serializerInterface,
     TagAwareCacheInterface $tagAwareCacheInterface): JsonResponse
     {
+        echo $this->getParameter('JWT_PASSPHRASE');
         $tagAwareCacheInterface->get('getAllCoffeesCache',
             function (ItemInterface $itemInterface) use ($coffeeRepository, $serializerInterface)
             {
@@ -165,6 +166,7 @@ class CoffeeController extends AbstractController
         $manager->flush();
         
         $tagAwareCacheInterface->invalidateTags(['coffeesCache']);
+        $tagAwareCacheInterface->invalidateTags(['getCoffee']);
         
         return new Response(null, JsonResponse::HTTP_NO_CONTENT);
     }

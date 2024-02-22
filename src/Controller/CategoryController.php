@@ -21,7 +21,14 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 
 class CategoryController extends AbstractController
 {
-    #[Route('/api/v1/categories', name:"category.getAll", methods: ['GET'])]
+    private const API_GATEWAY = '/api/v1';
+    private const CONTROLLER_NAME_PREFIX = 'category_';
+
+    #[Route(
+        CategoryController::API_GATEWAY . '/categories',
+        name: CategoryController::CONTROLLER_NAME_PREFIX . 'getAll',
+        methods: ['GET']
+    )]
     public function getAllCategories(CategoryRepository $categoryRep, SerializerInterface $serializer,
     TagAwareCacheInterface $cache): JsonResponse
     {
@@ -38,9 +45,13 @@ class CategoryController extends AbstractController
         return new JsonResponse($jsonCategories, JsonResponse::HTTP_OK, [], true);
     }
 
-    #[Route('/api/v1/category/{idCategory}', name:"category.get", methods: ['GET'])]
-    #[ParamConverter("category", options:["id"=>"idCategory"])]
-    public function getCategory(Category $category,TagAwareCacheInterface $cache, SerializerInterface $serializer): JsonResponse
+    #[Route(
+        CategoryController::API_GATEWAY . '/category/{id}',
+        name: CategoryController::CONTROLLER_NAME_PREFIX . 'get',
+        methods: ['GET']
+    )]
+    public function getCategory(Category $category,TagAwareCacheInterface $cache,
+    SerializerInterface $serializer): JsonResponse
     {
         $idCacheGetCategory = "getCategoryCache";
         $jsonCategory = $cache->get($idCacheGetCategory, function (ItemInterface $item) use ($category, $serializer) {
@@ -49,15 +60,18 @@ class CategoryController extends AbstractController
         return new JsonResponse($jsonCategory, JsonResponse::HTTP_OK, [], true);
     }
 
-    #[Route('/api/v1/category', name:"category.create", methods: ['POST'])]
-    #[IsGranted('ROLE_ADMIN', statusCode: 423)]
+    #[Route(
+        CategoryController::API_GATEWAY . '/category',
+        name: CategoryController::CONTROLLER_NAME_PREFIX . 'create',
+        methods: ['POST']
+    )]
     public function createCategory(Request $request,TagAwareCacheInterface $cache,ValidatorInterface $validator,
     UrlGeneratorInterface $urlGenerator,SerializerInterface $serializer, EntityManagerInterface $manager): JsonResponse
     {
         $category=$serializer->deserialize($request->getContent(), Category::class,'json');
         $category ->setCreatedAt();
         $category->setUpdatedAt();
-        $category->setStatus("on");
+        $category->setStatus("active");
         $errors = $validator->validate($category);
 
         if ($errors->count()) {
@@ -71,8 +85,8 @@ class CategoryController extends AbstractController
 
         $jsonCategory = $serializer->serialize($category, 'json', ['groups' => 'getCategory']);
         $location = $urlGenerator->generate(
-            'category.get',
-            ['idCategory' => $category->getId()],
+            'category_get',
+            ['id' => $category->getId()],
             UrlGeneratorInterface::ABSOLUTE_URL
         );
 
@@ -80,17 +94,20 @@ class CategoryController extends AbstractController
     }
 
 
-    #[Route('/api/v1/category/{id}', name:"category.update", methods: ['PUT'])]
-    #[IsGranted('ROLE_ADMIN', statusCode: 423)]
-    public function updateCategory(Category $updateCategory,TagAwareCacheInterface $cache,ValidatorInterface $validator,Request $request,
-    SerializerInterface $serializer, EntityManagerInterface $manager)
+    #[Route(
+        CategoryController::API_GATEWAY . '/category/{id}',
+        name: CategoryController::CONTROLLER_NAME_PREFIX . 'update',
+        methods: ['PUT']
+    )]
+    public function updateCategory(Category $updateCategory,TagAwareCacheInterface $cache,ValidatorInterface $validator,
+    Request $request, SerializerInterface $serializer, EntityManagerInterface $manager)
     {
         $updateCategory = $serializer->deserialize(
             $request->getContent(),
             Category::class,'json',
             [AbstractNormalizer::OBJECT_TO_POPULATE => $updateCategory]
         );
-        $updateCategory->setUpdatedAt()->setStatus("on");
+        $updateCategory->setUpdatedAt()->setStatus("active");
             $errors = $validator->validate($updateCategory);
             if ($errors->count()) {
                 return new JsonResponse(
@@ -107,25 +124,30 @@ class CategoryController extends AbstractController
     }
 
 
-    #[Route('/api/v1/category/{categoryId}/{isForced}', name:'category.delete', methods: ['DELETE'])]
-    #[ParamConverter('category', options: ['id' => 'categoryId'])]
-    #[IsGranted('ROLE_ADMIN', statusCode: 423)]
-    public function deleteCategory(Category $category,TagAwareCacheInterface $cache, Bool $isForced, EntityManagerInterface $manager): Response
+    #[Route(
+        CategoryController::API_GATEWAY . '/category/{id}/{isForced}',
+        name: CategoryController::CONTROLLER_NAME_PREFIX . 'delete',
+        methods: ['DELETE']
+    )]
+    public function deleteCategory(Category $category, TagAwareCacheInterface $cache, Bool $isForced,
+    EntityManagerInterface $manager): Response
     {
         if ($isForced) {
             $coffees=$category->getCoffees();
             foreach($coffees as $coffee) {
-            $category->removeCoffee($coffee);
+                $coffee->setCategory(null);
+                $coffee->setUpdatedAt();
+                $coffee->setStatus('inactive');
+                $manager->persist($coffee);
             }
             $manager->remove($category);
-            $manager->flush();
-            $cache->invalidateTags(['categoryCache']);
-            return new Response(null, Response::HTTP_NO_CONTENT);
+        } else {
+            $category->setStatus('inactive');
+            $category->setUpdatedAt();
+            $manager->persist($category);
         }
 
-        $category->setStatus('off');
-        $category->setUpdatedAt();
-        $manager->persist($category);
+        
         $manager->flush();
         $cache->invalidateTags(['categoryCache']);
         return new Response(null, Response::HTTP_NO_CONTENT);
