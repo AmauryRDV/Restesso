@@ -40,9 +40,12 @@ class CategoryController extends AbstractController
 
     #[Route('/api/v1/category/{idCategory}', name:"category.get", methods: ['GET'])]
     #[ParamConverter("category", options:["id"=>"idCategory"])]
-    public function getCategory(Category $category, SerializerInterface $serializer): JsonResponse
+    public function getCategory(Category $category,TagAwareCacheInterface $cache, SerializerInterface $serializer): JsonResponse
     {
-        $jsonCategory = $serializer->serialize($category, 'json', ['groups'=> 'getCategory']);
+        $idCacheGetCategory = "getCategoryCache";
+        $jsonCategory = $cache->get($idCacheGetCategory, function (ItemInterface $item) use ($category, $serializer) {
+        $item->tag('categoryCache');
+        return $serializer->serialize($category, 'json', ['groups'=> 'getCategory']);});
         return new JsonResponse($jsonCategory, JsonResponse::HTTP_OK, [], true);
     }
 
@@ -107,7 +110,7 @@ class CategoryController extends AbstractController
     #[Route('/api/v1/category/{categoryId}/{isForced}', name:'category.delete', methods: ['DELETE'])]
     #[ParamConverter('category', options: ['id' => 'categoryId'])]
     #[IsGranted('ROLE_ADMIN', statusCode: 423)]
-    public function deleteCategory(Category $category, Bool $isForced, EntityManagerInterface $manager): Response
+    public function deleteCategory(Category $category,TagAwareCacheInterface $cache, Bool $isForced, EntityManagerInterface $manager): Response
     {
         if ($isForced) {
             $coffees=$category->getCoffees();
@@ -116,6 +119,7 @@ class CategoryController extends AbstractController
             }
             $manager->remove($category);
             $manager->flush();
+            $cache->invalidateTags(['categoryCache']);
             return new Response(null, Response::HTTP_NO_CONTENT);
         }
 
@@ -123,6 +127,7 @@ class CategoryController extends AbstractController
         $category->setUpdatedAt();
         $manager->persist($category);
         $manager->flush();
+        $cache->invalidateTags(['categoryCache']);
         return new Response(null, Response::HTTP_NO_CONTENT);
     }
 }

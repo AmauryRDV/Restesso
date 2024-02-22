@@ -68,11 +68,14 @@ class AppFixtures extends Fixture
             $updatedAt = $this->faker->dateTimeBetween($createdAt,"now");
             $category->setCreatedAt($createdAt);
             $category->setUpdatedAt($updatedAt);
-            $category->setStatus("on");
+            $category->setStatus("active");
             $manager->persist($category);
             $bean = new Bean();
             $bean->setName("Bean ". $j);
             $bean->setOrigin("Pays ". $j);
+            $bean->setCreatedAt($createdAt);
+            $bean->setUpdatedAt($updatedAt);
+            $bean->setStatus("active");
             $bean->setDescription("Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas in.". $j);
             $manager->persist($bean);
 
@@ -84,7 +87,7 @@ class AppFixtures extends Fixture
                 $updatedAt = $this->faker->dateTimeBetween($createdAt,"now");
                 $ig->setCreatedAt($createdAt);
                 $ig->setUpdatedAt($updatedAt);
-                $ig->setStatus("on");
+                $ig->setStatus("active");
                 $ig->setCategory($category);
                 $ig->setBean($bean);
                 $manager->persist($ig);
