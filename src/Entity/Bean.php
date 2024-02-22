@@ -8,6 +8,8 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
+
 
 #[ORM\Entity(repositoryClass: BeanRepository::class)]
 class Bean extends SoftDeleteFields
@@ -16,11 +18,17 @@ class Bean extends SoftDeleteFields
     #[ORM\GeneratedValue]
     #[ORM\Column]
     #[Groups(["getCoffee", "getBean"])]
-
     private ?int $id = null;
 
     #[ORM\Column(length: 100)]
     #[Groups(["getCoffee", "getBean"])]
+    #[Assert\Length(
+        min : 2,
+        max : 100,
+        minMessage : 'The name must be at least {{ limit }} characters long',
+        maxMessage: 'The name cannot be longer than {{ limit }} characters',
+
+    )]
     private ?string $name = null;
 
     #[ORM\Column(length: 200, nullable: true)]
@@ -29,7 +37,6 @@ class Bean extends SoftDeleteFields
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     #[Groups(["getCoffee", "getBean"])]
-
     private ?string $description = null;
 
     #[ORM\OneToMany(
@@ -85,10 +92,6 @@ class Bean extends SoftDeleteFields
 
         return $this;
     }
-
-
-    
-    
 
     /**
      * @return Collection<int, Coffee>

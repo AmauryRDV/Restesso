@@ -30,12 +30,7 @@ class Category extends SoftDeleteFields
     )]
     private ?string $name = null;
 
-    #[ORM\OneToMany(
-        mappedBy: 'category',
-        targetEntity: Coffee::class,
-        cascade: ['persist', 'remove'],
-        orphanRemoval: true
-    )]
+    #[ORM\OneToMany(mappedBy: 'category', targetEntity: Coffee::class)]
     private Collection $coffees;
 
     public function __construct()

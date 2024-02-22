@@ -25,7 +25,7 @@ class CoffeeRepository extends ServiceEntityRepository
     {
         return $this->createQueryBuilder('coffee')
             ->andWhere('coffee.id = :id')
-            ->andWhere('coffee.status = on')
+            ->andWhere("coffee.status='active'")
             ->setParameter('id', $id)
             ->getQuery()
             ->getOneOrNullResult()
@@ -35,7 +35,7 @@ class CoffeeRepository extends ServiceEntityRepository
     public function findAllActive(): array
     {
         return $this->createQueryBuilder('coffee')
-            ->andWhere('coffee.status = on')
+            ->andWhere("coffee.status='active'")
             ->getQuery()
             ->getResult()
         ;

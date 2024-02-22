@@ -5,8 +5,9 @@ namespace App\Entity;
 use App\Repository\TasteRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
+
 
 #[ORM\Entity(repositoryClass: TasteRepository::class)]
 class Taste extends SoftDeleteFields
@@ -17,6 +18,13 @@ class Taste extends SoftDeleteFields
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\Length(
+        min : 2,
+        max : 100,
+        minMessage : 'The name must be at least {{ limit }} characters long',
+        maxMessage: 'The name cannot be longer than {{ limit }} characters',
+
+    )]
     private ?string $name = null;
 
     #[ORM\Column(length: 255)]
@@ -28,12 +36,7 @@ class Taste extends SoftDeleteFields
     #[ORM\Column]
     private ?float $caffeineRate = null;
 
-    #[ORM\OneToMany(
-        mappedBy: 'taste',
-        targetEntity: Coffee::class,
-        cascade: ['persist', 'remove'],
-        orphanRemoval: true
-    )]
+    #[ORM\OneToMany(mappedBy: 'taste', targetEntity: Coffee::class)]
     private Collection $coffees;
 
     public function __construct()
