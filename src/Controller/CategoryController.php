@@ -20,7 +20,15 @@ use Symfony\Contracts\Cache\TagAwareCacheInterface;
 
 class CategoryController extends AbstractController
 {
-    #[Route('/api/v1/categories', name:"category.getAll", methods: ['GET'])]
+    private const API_GATEWAY = '/api/v1';
+    private const CONTROLLER_NAME_PREFIX = 'category_';
+
+    #[Route(
+        CategoryController::API_GATEWAY . '/categories',
+        name: CategoryController::CONTROLLER_NAME_PREFIX . 'getAll',
+        methods: ['GET']
+    )]
+    
     public function getAllCategories(CategoryRepository $categoryRep, SerializerInterface $serializer,
     TagAwareCacheInterface $cache): JsonResponse
     {
@@ -37,22 +45,29 @@ class CategoryController extends AbstractController
         return new JsonResponse($jsonCategories, JsonResponse::HTTP_OK, [], true);
     }
 
-    #[Route('/api/v1/category/{idCategory}', name:"category.get", methods: ['GET'])]
-    #[ParamConverter("category", options:["id"=>"idCategory"])]
-    public function getCategory(Category $category, SerializerInterface $serializer): JsonResponse
+    #[Route(
+        CategoryController::API_GATEWAY . '/category/{id}',
+        name: CategoryController::CONTROLLER_NAME_PREFIX . 'get',
+        methods: ['GET']
+    )]
+    public function getCategory(Category $category,TagAwareCacheInterface $cache, SerializerInterface $serializer): JsonResponse
     {
         $jsonCategory = $serializer->serialize($category, 'json', ['groups'=> 'getCategory']);
         return new JsonResponse($jsonCategory, JsonResponse::HTTP_OK, [], true);
     }
 
-    #[Route('/api/v1/category', name:"category.create", methods: ['POST'])]
+    #[Route(
+        CategoryController::API_GATEWAY . '/category',
+        name: CategoryController::CONTROLLER_NAME_PREFIX . 'create',
+        methods: ['POST']
+    )]
     public function createCategory(Request $request,TagAwareCacheInterface $cache,ValidatorInterface $validator,
     UrlGeneratorInterface $urlGenerator,SerializerInterface $serializer, EntityManagerInterface $manager): JsonResponse
     {
         $category=$serializer->deserialize($request->getContent(), Category::class,'json');
         $category ->setCreatedAt();
         $category->setUpdatedAt();
-        $category->setStatus("on");
+        $category->setStatus("active");
         $errors = $validator->validate($category);
 
         if ($errors->count()) {
@@ -66,8 +81,8 @@ class CategoryController extends AbstractController
 
         $jsonCategory = $serializer->serialize($category, 'json', ['groups' => 'getCategory']);
         $location = $urlGenerator->generate(
-            'category.get',
-            ['idCategory' => $category->getId()],
+            'category_get',
+            ['id' => $category->getId()],
             UrlGeneratorInterface::ABSOLUTE_URL
         );
 
@@ -75,8 +90,12 @@ class CategoryController extends AbstractController
     }
 
 
-    #[Route('/api/v1/category/{category}', name:"category.update", methods: ['PUT'])]
-    public function updateCategory(Category $updateCategory,ValidatorInterface $validator,Request $request,
+    #[Route(
+        CategoryController::API_GATEWAY . '/category/{id}',
+        name: CategoryController::CONTROLLER_NAME_PREFIX . 'update',
+        methods: ['PUT']
+    )]
+    public function updateCategory(Category $updateCategory,TagAwareCacheInterface $cache,ValidatorInterface $validator,Request $request,
     SerializerInterface $serializer, EntityManagerInterface $manager)
     {
         $updateCategory = $serializer->deserialize(
@@ -84,7 +103,7 @@ class CategoryController extends AbstractController
             Category::class,'json',
             [AbstractNormalizer::OBJECT_TO_POPULATE => $updateCategory]
         );
-        $updateCategory->setUpdatedAt()->setStatus("on");
+        $updateCategory->setUpdatedAt()->setStatus("active");
             $errors = $validator->validate($updateCategory);
             if ($errors->count()) {
                 return new JsonResponse(
@@ -101,9 +120,12 @@ class CategoryController extends AbstractController
     }
 
 
-    #[Route('/api/v1/category/{categoryId}/{isForced}', name:'category.delete', methods: ['DELETE'])]
-    #[ParamConverter('category', options: ['id' => 'categoryId'])]
-    public function deleteCategory(Category $category, Bool $isForced, EntityManagerInterface $manager): Response
+    #[Route(
+        CategoryController::API_GATEWAY . '/category/{id}/{isForced}',
+        name: CategoryController::CONTROLLER_NAME_PREFIX . 'delete',
+        methods: ['DELETE']
+    )]
+    public function deleteCategory(Category $category,TagAwareCacheInterface $cache, Bool $isForced, EntityManagerInterface $manager): Response
     {
         if ($isForced) {
             $coffees=$category->getCoffees();
@@ -115,7 +137,7 @@ class CategoryController extends AbstractController
             return new Response(null, Response::HTTP_NO_CONTENT);
         }
 
-        $category->setStatus('off');
+        $category->setStatus('inactive');
         $category->setUpdatedAt();
         $manager->persist($category);
         $manager->flush();
