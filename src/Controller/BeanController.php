@@ -21,17 +21,14 @@ use Symfony\Contracts\Cache\TagAwareCacheInterface;
 
 class BeanController extends AbstractController
 {
-    #[Route('/bean', name: 'app_bean')]
-    public function index(): JsonResponse
-    {
-        return $this->json([
-            'message' => 'Welcome to your new controller!',
-            'path' => 'src/Controller/BeanController.php',
-        ]);
-    }
+    private const API_GATEWAY = '/api/v1';
+    private const CONTROLLER_NAME_PREFIX = 'bean_';
 
-    
-    #[Route('/api/v1/beans', name:"bean.getAll", methods: ['GET'])]
+    #[Route(
+        BeanController::API_GATEWAY . '/beans',
+        name: BeanController::CONTROLLER_NAME_PREFIX . 'getAll',
+        methods: ['GET']
+    )]
     public function getAllBeans(BeanRepository $beanRep, SerializerInterface $serializer, TagAwareCacheInterface $cache)
     {
         $idCacheGetAllBeans = "getAllBeansCache";
@@ -47,20 +44,30 @@ class BeanController extends AbstractController
     }
 
     
-    #[Route('/api/v1/bean/{idBean}', name:"bean.get", methods: ['GET'])]
-    #[ParamConverter("bean", options:["id"=>"idBean"])]
+    #[Route(
+        BeanController::API_GATEWAY . '/bean/{id}',
+        name: BeanController::CONTROLLER_NAME_PREFIX . 'get',
+        methods: ['GET']
+    )]
     public function getBean(Bean $bean, SerializerInterface $serializer): JsonResponse
     {
         $jsonBean = $serializer->serialize($bean, 'json', ['groups'=> 'getBean']);
         return new JsonResponse($jsonBean, 200, [], true);
     }
 
-    #[Route('/api/v1/bean', name:'bean.create', methods: ['POST'])]
+    #[Route(
+        BeanController::API_GATEWAY . '/bean',
+        name: BeanController::CONTROLLER_NAME_PREFIX . 'create',
+        methods: ['POST']
+    )]
     public function createBean(Request $request, UrlGeneratorInterface $urlGeneratorInterface,
     SerializerInterface $serializerInterface, EntityManagerInterface $manager,
     ValidatorInterface $validatorInterface, TagAwareCacheInterface $tagAwareCacheInterface): JsonResponse
     {
         $bean = $serializerInterface->deserialize($request->getContent(), Bean::class, 'json');
+        $bean->setCreatedAt();
+        $bean->setUpdatedAt();
+        $bean->setStatus('active');
         $errors = $validatorInterface->validate($bean);
         if (count($errors) > 0) {
             return new JsonResponse($serializerInterface->serialize($errors, 'json'), JsonResponse::HTTP_BAD_REQUEST);
@@ -71,23 +78,28 @@ class BeanController extends AbstractController
 
         $jsonBean = $serializerInterface->serialize($bean, 'json', ['groups' => 'getBean']);
         $location = $urlGeneratorInterface->generate(
-            'bean.get',
-            ['idBean'=> $bean->getId()],
+            'bean_get',
+            ['id'=> $bean->getId()],
             UrlGeneratorInterface::ABSOLUTE_URL
         );
         return new JsonResponse($jsonBean, JsonResponse::HTTP_CREATED, ['Location' => $location], true);
     }
 
 
-    #[Route('/api/v1/bean/{id}', name:"bean.update", methods: ['PUT'])]
+    #[Route(
+        BeanController::API_GATEWAY . '/bean/{id}',
+        name: BeanController::CONTROLLER_NAME_PREFIX . 'update',
+        methods: ['PUT']
+    )]    
     public function updateBean(Bean $updateBean,ValidatorInterface $validator,Request $request,
     SerializerInterface $serializer, EntityManagerInterface $manager, TagAwareCacheInterface $tagAwareCacheInterface)
     {
-        $updateBean = $serializer->deserialize(
+            $serializer->deserialize(
             $request->getContent(),
             Bean::class,'json',
             [AbstractNormalizer::OBJECT_TO_POPULATE => $updateBean]
         );
+        $updateBean->setUpdatedAt();
         $errors = $validator->validate($updateBean);
         if ($errors->count())
         {
@@ -100,8 +112,11 @@ class BeanController extends AbstractController
     }
 
 
-    #[Route('/api/v1/bean/{beanId}', name:'bean.delete', methods: ['DELETE'])]
-    #[ParamConverter('bean', options: ['id' => 'beanId'])]
+    #[Route(
+        BeanController::API_GATEWAY . '/bean/{id}',
+        name: BeanController::CONTROLLER_NAME_PREFIX . 'delete',
+        methods: ['DELETE']
+    )]
     public function deleteBean(Bean $bean, EntityManagerInterface $manager, TagAwareCacheInterface $tagAwareCacheInterface):Response 
     {
             $coffees=$bean->getCoffees();
