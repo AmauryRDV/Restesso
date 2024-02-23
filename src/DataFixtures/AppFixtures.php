@@ -104,7 +104,7 @@ class AppFixtures extends Fixture
             $taste->setName("Taste ". $j);
             $taste->setDescription("desc ". $j);
             $taste->setCaffeineRate($this->faker->randomFloat(2,0,1));
-            $taste->setIntensity($this->faker->randomInt(0,5));
+            $taste->setIntensity($this->faker->numberBetween(0, 5));
             $taste->setCreatedAt($createdAt);
             $taste->setUpdatedAt($updatedAt);
             $taste->setStatus("active");
