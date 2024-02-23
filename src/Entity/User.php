@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -26,6 +28,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     #[ORM\Column]
     private ?string $password = null;
+
+    #[ORM\ManyToMany(targetEntity: Persona::class, mappedBy: 'users')]
+    private Collection $personas;
+
+    public function __construct()
+    {
+        $this->personas = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -95,5 +105,32 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         // If you store any temporary, sensitive data on the user, clear it here
         // $this->plainPassword = null;
+    }
+
+    /**
+     * @return Collection<int, Persona>
+     */
+    public function getPersonas(): Collection
+    {
+        return $this->personas;
+    }
+
+    public function addPersona(Persona $persona): static
+    {
+        if (!$this->personas->contains($persona)) {
+            $this->personas->add($persona);
+            $persona->addUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removePersona(Persona $persona): static
+    {
+        if ($this->personas->removeElement($persona)) {
+            $persona->removeUser($this);
+        }
+
+        return $this;
     }
 }

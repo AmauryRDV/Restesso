@@ -24,7 +24,6 @@ abstract class SoftDeleteFields
     #[Assert\Choice(choices: ['active', 'inactive'])]
     #[Groups(['getCoffee', 'getCategory', 'getBean', 'getLoadedFile', 'getTaste'])]
     private ?string $status = null;
-
     
     public function getCreatedAt(): ?\DateTimeInterface
     {
