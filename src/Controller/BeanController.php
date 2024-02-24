@@ -18,6 +18,9 @@ use Symfony\Component\Validator\Constraints\Json;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Contracts\Cache\ItemInterface;
 use Symfony\Contracts\Cache\TagAwareCacheInterface;
+use Nelmio\ApiDocBundle\Annotation\Model;
+use Nelmio\ApiDocBundle\Annotation\Security;
+use OpenApi\Annotations as OA;
 
 class BeanController extends AbstractController
 {
@@ -29,6 +32,19 @@ class BeanController extends AbstractController
         name: BeanController::CONTROLLER_NAME_PREFIX . 'getAll',
         methods: ['GET']
     )]
+       /**
+     * This method return all the beans availables.
+     * @OA\Response(
+     * response=200,
+     * description="Return beans list",
+     * @OA\JsonContent(
+     * type="array",
+     * @OA\Items(ref=@Model(type=Bean::class, groups={"getBeans"}))
+     * )
+     * )
+     * @OA\Tag(name="Bean")
+     *
+     */
     public function getAllBeans(BeanRepository $beanRep, SerializerInterface $serializer, TagAwareCacheInterface $cache)
     {
         $idCacheGetAllBeans = "getAllBeansCache";
@@ -49,6 +65,26 @@ class BeanController extends AbstractController
         name: BeanController::CONTROLLER_NAME_PREFIX . 'get',
         methods: ['GET']
     )]
+       /**
+     * This method return a bean by his ID.
+     *  @OA\Parameter(
+     * name="id",
+     * in="path",
+     * description="ID of the bean",
+     * required=true,
+     * @OA\Schema(type="integer")
+     * )
+     * @OA\Response(
+     * response=200,
+     * description="Return a bean",
+     * @OA\JsonContent(
+     * type="array",
+     * @OA\Items(ref=@Model(type=Bean::class, groups={"getBean"}))
+     * )
+     * )
+     * @OA\Tag(name="Bean")
+     *
+     */
     public function getBean(Bean $bean, SerializerInterface $serializer): JsonResponse
     {
         $jsonBean = $serializer->serialize($bean, 'json', ['groups'=> 'getBean']);
@@ -60,6 +96,18 @@ class BeanController extends AbstractController
         name: BeanController::CONTROLLER_NAME_PREFIX . 'create',
         methods: ['POST']
     )]
+    /**
+     * This method give you the possibility to create a new bean.
+     * @OA\Parameter(
+     * name="name",
+     * in="path",
+     * description="Name of the bean",
+     * required=true,
+     * @OA\Schema(type="string")
+     * )
+     * @OA\Tag(name="Bean")
+     *
+     */
     public function createBean(Request $request, UrlGeneratorInterface $urlGeneratorInterface,
     SerializerInterface $serializerInterface, EntityManagerInterface $manager,
     ValidatorInterface $validatorInterface, TagAwareCacheInterface $tagAwareCacheInterface): JsonResponse
@@ -91,6 +139,32 @@ class BeanController extends AbstractController
         name: BeanController::CONTROLLER_NAME_PREFIX . 'update',
         methods: ['PUT']
     )]    
+       /**
+     * This method is able to update a bean by her Id.
+     * @OA\Parameter(
+     * name="id",
+     * in="path",
+     * description="Id of the bean",
+     * required=true,
+     * @OA\Schema(type="int")
+     * )
+     * @OA\Parameter(
+     * name="name",
+     * in="path",
+     * description="Name of the bean",
+     * required=true,
+     * @OA\Schema(type="string")
+     * )
+     * @OA\Parameter(
+     * name="status",
+     * in="path",
+     * description="Status of the bean (Can be active or unactive)",
+     * required=true,
+     * @OA\Schema(type="string")
+     * )
+     * @OA\Tag(name="Bean")
+     *
+     */
     public function updateBean(Bean $updateBean,ValidatorInterface $validator,Request $request,
     SerializerInterface $serializer, EntityManagerInterface $manager, TagAwareCacheInterface $tagAwareCacheInterface)
     {
@@ -117,6 +191,18 @@ class BeanController extends AbstractController
         name: BeanController::CONTROLLER_NAME_PREFIX . 'delete',
         methods: ['DELETE']
     )]
+    /**
+    * This method remove a Category with the ID.
+    * @OA\Parameter(
+    * name="id",
+    * in="path",
+    * description="Id of the category",
+    * required=true,
+    * @OA\Schema(type="int")
+    * )
+    * @OA\Tag(name="Bean")
+    *
+    */
     public function deleteBean(Bean $bean, EntityManagerInterface $manager, TagAwareCacheInterface $tagAwareCacheInterface):Response 
     {
             $coffees=$bean->getCoffees();

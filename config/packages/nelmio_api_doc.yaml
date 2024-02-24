@@ -4,11 +4,11 @@ nelmio_api_doc:
       - url: http://localhost:8000/
         description: API over HTTP
     info:
-      title: Medica
-      description: Medica API
+      title: Restesso ☕
+      description: Restesso is an API for coffee enthusiasts. Here, you can see the documentation for the API. Enjoy your visit !
       version: 1.0.0
     paths:
-      /api/login_check:
+      /api/v1/login_check:
         post:
           operationId: postCredentialsItem
           tags:

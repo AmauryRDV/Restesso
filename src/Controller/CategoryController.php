@@ -18,9 +18,14 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Contracts\Cache\ItemInterface;
 use Symfony\Contracts\Cache\TagAwareCacheInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
+use Nelmio\ApiDocBundle\Annotation\Model;
+use Nelmio\ApiDocBundle\Annotation\Security;
+use OpenApi\Annotations as OA;
+
 
 class CategoryController extends AbstractController
 {
+   
     private const API_GATEWAY = '/api/v1';
     private const CONTROLLER_NAME_PREFIX = 'category_';
 
@@ -29,6 +34,20 @@ class CategoryController extends AbstractController
         name: CategoryController::CONTROLLER_NAME_PREFIX . 'getAll',
         methods: ['GET']
     )]
+
+    /**
+     * This method return all the categories availables.
+     * @OA\Response(
+     * response=200,
+     * description="Return categories list",
+     * @OA\JsonContent(
+     * type="array",
+     * @OA\Items(ref=@Model(type=Category::class, groups={"getCategories"}))
+     * )
+     * )
+     * @OA\Tag(name="Category")
+     *
+     */
     public function getAllCategories(CategoryRepository $categoryRep, SerializerInterface $serializer,
     TagAwareCacheInterface $cache): JsonResponse
     {
@@ -50,6 +69,26 @@ class CategoryController extends AbstractController
         name: CategoryController::CONTROLLER_NAME_PREFIX . 'get',
         methods: ['GET']
     )]
+        /**
+     * This method return a category by his ID.
+     *  @OA\Parameter(
+     * name="id",
+     * in="path",
+     * description="ID of the category",
+     * required=true,
+     * @OA\Schema(type="integer")
+     * )
+     * @OA\Response(
+     * response=200,
+     * description="Return a category",
+     * @OA\JsonContent(
+     * type="array",
+     * @OA\Items(ref=@Model(type=Category::class, groups={"getCategory"}))
+     * )
+     * )
+     * @OA\Tag(name="Category")
+     *
+     */
     public function getCategory(Category $category,TagAwareCacheInterface $cache,
     SerializerInterface $serializer): JsonResponse
     {
@@ -65,6 +104,18 @@ class CategoryController extends AbstractController
         name: CategoryController::CONTROLLER_NAME_PREFIX . 'create',
         methods: ['POST']
     )]
+       /**
+     * This method give you the possibility to create a new category .
+     * @OA\Parameter(
+     * name="name",
+     * in="path",
+     * description="Name of the category",
+     * required=true,
+     * @OA\Schema(type="string")
+     * )
+     * @OA\Tag(name="Category")
+     *
+     */
     public function createCategory(Request $request,TagAwareCacheInterface $cache,ValidatorInterface $validator,
     UrlGeneratorInterface $urlGenerator,SerializerInterface $serializer, EntityManagerInterface $manager): JsonResponse
     {
@@ -99,6 +150,32 @@ class CategoryController extends AbstractController
         name: CategoryController::CONTROLLER_NAME_PREFIX . 'update',
         methods: ['PUT']
     )]
+        /**
+     * This method is able to update a category by her Id.
+     * @OA\Parameter(
+     * name="id",
+     * in="path",
+     * description="Id of the category",
+     * required=true,
+     * @OA\Schema(type="int")
+     * )
+     * @OA\Parameter(
+     * name="name",
+     * in="path",
+     * description="Name of the category",
+     * required=true,
+     * @OA\Schema(type="string")
+     * )
+     * @OA\Parameter(
+     * name="status",
+     * in="path",
+     * description="Status of the category (Can be active or unactive)",
+     * required=true,
+     * @OA\Schema(type="string")
+     * )
+     * @OA\Tag(name="Category")
+     *
+     */
     public function updateCategory(Category $updateCategory,TagAwareCacheInterface $cache,ValidatorInterface $validator,
     Request $request, SerializerInterface $serializer, EntityManagerInterface $manager)
     {
@@ -129,6 +206,26 @@ class CategoryController extends AbstractController
         name: CategoryController::CONTROLLER_NAME_PREFIX . 'delete',
         methods: ['DELETE']
     )]
+        /**
+     * This method remove a Category with the ID.
+     * @OA\Parameter(
+     * name="id",
+     * in="path",
+     * description="Id of the category",
+     * required=true,
+     * @OA\Schema(type="int")
+     * )
+     * @OA\Tag(name="Category")
+     * @OA\Parameter(
+     * name="isForced",
+     * in="path",
+     * description="Disable or Delete a category",
+     * required=true,
+     * @OA\Schema(type="Bool")
+     * )
+     * @OA\Tag(name="Category")
+     *
+     */
     public function deleteCategory(Category $category, TagAwareCacheInterface $cache, Bool $isForced,
     EntityManagerInterface $manager): Response
     {
