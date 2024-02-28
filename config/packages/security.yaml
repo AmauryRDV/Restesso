@@ -38,7 +38,7 @@ security:
     access_control:
         - { path: ^/api/v1/(login|token/refresh), roles: PUBLIC_ACCESS }
         - { path: ^/api/v1/doc, roles: PUBLIC_ACCESS }
-        - { path: ^/api/v1, roles: IS_AUTHENTICATED_FULLY , methods: [GET] }
+        - { path: ^/api/v1, roles: [IS_AUTHENTICATED_FULLY] , methods: [GET] }
         - { path: ^/api/v1, roles: ROLE_ADMIN , methods: [POST, PUT , DELETE] }
  
 when@test:

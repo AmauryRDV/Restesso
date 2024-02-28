@@ -21,28 +21,23 @@ class TasteRepository extends ServiceEntityRepository
         parent::__construct($registry, Taste::class);
     }
 
-//    /**
-//     * @return Taste[] Returns an array of Taste objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('t')
-//            ->andWhere('t.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('t.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
+    public function findActive(int $id): ?Taste
+    {
+        return $this->createQueryBuilder('taste')
+            ->andWhere('taste.id = :id')
+            ->andWhere("taste.status='active'")
+            ->setParameter('id', $id)
+            ->getQuery()
+            ->getOneOrNullResult()
+        ;
+    }
 
-//    public function findOneBySomeField($value): ?Taste
-//    {
-//        return $this->createQueryBuilder('t')
-//            ->andWhere('t.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
+    public function findAllActive(): array
+    {
+        return $this->createQueryBuilder('taste')
+            ->andWhere("taste.status='active'")
+            ->getQuery()
+            ->getResult()
+        ;
+    }
 }

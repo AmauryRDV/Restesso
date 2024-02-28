@@ -21,28 +21,23 @@ class BeanRepository extends ServiceEntityRepository
         parent::__construct($registry, Bean::class);
     }
 
-//    /**
-//     * @return Bean[] Returns an array of Bean objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('b')
-//            ->andWhere('b.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('b.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
+    public function findActive(int $id): ?Bean
+    {
+        return $this->createQueryBuilder('bean')
+            ->andWhere('bean.id = :id')
+            ->andWhere("bean.status='active'")
+            ->setParameter('id', $id)
+            ->getQuery()
+            ->getOneOrNullResult()
+        ;
+    }
 
-//    public function findOneBySomeField($value): ?Bean
-//    {
-//        return $this->createQueryBuilder('b')
-//            ->andWhere('b.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
+    public function findAllActive(): array
+    {
+        return $this->createQueryBuilder('bean')
+            ->andWhere("bean.status='active'")
+            ->getQuery()
+            ->getResult()
+        ;
+    }
 }
