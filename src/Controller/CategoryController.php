@@ -173,15 +173,21 @@ class CategoryController extends AbstractController
     public function deleteCategoryIsForced(Category $category, TagAwareCacheInterface $cache, Bool $isForced,
     EntityManagerInterface $manager): Response
     {
+        $tagToInvalidate = ['categoryCache'];
         if ($isForced) {
             $coffees=$category->getCoffees();
             foreach($coffees as $coffee) {
+                $category->removeCoffee($coffee);
+
                 $coffee->setCategory(null);
                 $coffee->setUpdatedAt();
                 $coffee->setStatus('inactive');
+
                 $manager->persist($coffee);
             }
             $manager->remove($category);
+
+            $tagToInvalidate[] = 'coffeesCache';
         } else {
             $category->setStatus('inactive');
             $category->setUpdatedAt();
@@ -190,7 +196,7 @@ class CategoryController extends AbstractController
 
         
         $manager->flush();
-        $cache->invalidateTags(['categoryCache']);
+        $cache->invalidateTags($tagToInvalidate);
         return new Response(null, Response::HTTP_NO_CONTENT);
     }
 

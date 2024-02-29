@@ -17,11 +17,11 @@ class Bean extends SoftDeleteFields
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(["getCoffee", "getBean"])]
+    #[Groups(['getCoffee', 'getBean'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 100)]
-    #[Groups(["getCoffee", "getBean"])]
+    #[Groups(['getBean', 'getCoffee'])]
     #[Assert\Length(
         min : 2,
         max : 100,
@@ -32,11 +32,11 @@ class Bean extends SoftDeleteFields
     private ?string $name = null;
 
     #[ORM\Column(length: 200, nullable: true)]
-    #[Groups(["getCoffee", "getBean"])]
+    #[Groups(['getBean'])]
     private ?string $origin = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
-    #[Groups(["getCoffee", "getBean"])]
+    #[Groups(['getBean'])]
     private ?string $description = null;
 
     #[ORM\OneToMany(
@@ -45,6 +45,7 @@ class Bean extends SoftDeleteFields
         cascade: ['persist', 'remove'],
         orphanRemoval: true
     )]
+    #[Groups(['getBean'])]
     private Collection $coffees;
 
     public function __construct()

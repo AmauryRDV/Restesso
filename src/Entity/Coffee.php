@@ -14,7 +14,7 @@ class Coffee extends SoftDeleteFields
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(["getCoffee"])]
+    #[Groups(['getCoffee', 'getTaste', 'getCategory', 'getBean'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]

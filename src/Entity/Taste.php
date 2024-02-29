@@ -6,6 +6,7 @@ use App\Repository\TasteRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 
@@ -15,6 +16,7 @@ class Taste extends SoftDeleteFields
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['getTaste', 'getCoffee'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
@@ -25,18 +27,23 @@ class Taste extends SoftDeleteFields
         maxMessage: 'The name cannot be longer than {{ limit }} characters',
 
     )]
+    #[Groups(['getTaste', 'getCoffee'])]
     private ?string $name = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(["getTaste"])]
     private ?string $description = null;
 
     #[ORM\Column]
+    #[Groups(["getTaste"])]
     private ?int $intensity = null;
 
     #[ORM\Column]
+    #[Groups(["getTaste"])]
     private ?float $caffeineRate = null;
 
     #[ORM\OneToMany(mappedBy: 'taste', targetEntity: Coffee::class)]
+    #[Groups(["getTaste"])]
     private Collection $coffees;
 
     public function __construct()

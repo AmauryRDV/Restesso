@@ -5,7 +5,6 @@ namespace App\Entity;
 use App\Repository\CategoryRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -16,11 +15,11 @@ class Category extends SoftDeleteFields
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(["getCoffee", "getCategory"])]
+    #[Groups(['getCoffee', 'getCategory'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(["getCategory"])]
+    #[Groups(['getCategory', 'getCoffee'])]
     #[Assert\Length(
         min : 2,
         max : 100,
@@ -31,6 +30,7 @@ class Category extends SoftDeleteFields
     private ?string $name = null;
 
     #[ORM\OneToMany(mappedBy: 'category', targetEntity: Coffee::class)]
+    #[Groups(['getCategory'])]
     private Collection $coffees;
 
     public function __construct()

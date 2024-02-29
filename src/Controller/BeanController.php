@@ -157,12 +157,22 @@ class BeanController extends AbstractController
     public function deleteBeanIsForced(Bean $bean, Bool $isforced, EntityManagerInterface $manager,
     TagAwareCacheInterface $tagAwareCacheInterface): JsonResponse
     {
+        $tagToInvalidate = ['beanCache'];
+
         if ($isforced) {
             $coffees=$bean->getCoffees();
             foreach($coffees as $coffee) {
+                $coffee->setBean(null);
+                $coffee->setUpdatedAt();
+                $coffee->setStatus('inactive');
+
                 $bean->removeCoffee($coffee);
+
+                $manager->persist($coffee);
             }
             $manager->remove($bean);
+
+            $tagToInvalidate[] = 'coffeesCache';
         } else {
             $bean->setUpdatedAt()->setStatus('inactive');
             $manager->persist($bean);
@@ -170,7 +180,7 @@ class BeanController extends AbstractController
 
         $manager->flush();
 
-        $tagAwareCacheInterface->invalidateTags(['beanCache']);
+        $tagAwareCacheInterface->invalidateTags($tagToInvalidate);
         return new JsonResponse(null, JsonResponse::HTTP_NO_CONTENT);
     }
 
