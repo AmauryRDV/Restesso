@@ -66,7 +66,7 @@ class TasteController extends AbstractController
         name: TasteController::CONTROLLER_NAME_PREFIX . 'get',
         methods: ['GET']
     )]
-    public function getTaste(int $int, SerializerInterface $serializerInterface,
+    public function getTaste(int $id, SerializerInterface $serializerInterface,
     TasteRepository $tasteRepository): JsonResponse
     {
         $taste = $tasteRepository->findActive($int);
