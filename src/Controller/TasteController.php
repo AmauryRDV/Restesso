@@ -69,7 +69,7 @@ class TasteController extends AbstractController
     public function getTaste(int $id, SerializerInterface $serializerInterface,
     TasteRepository $tasteRepository): JsonResponse
     {
-        $taste = $tasteRepository->findActive($int);
+        $taste = $tasteRepository->findActive($id);
         $jsonTaste = $serializerInterface->serialize($taste, 'json', ['groups' => 'getTaste']);
         return new JsonResponse($jsonTaste, JsonResponse::HTTP_OK, [], true);
     }
