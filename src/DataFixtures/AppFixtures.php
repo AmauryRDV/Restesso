@@ -5,6 +5,7 @@ namespace App\DataFixtures;
 use App\Entity\Bean;
 use App\Entity\Category;
 use App\Entity\Coffee;
+use App\Entity\LoadedFile;
 use App\Entity\Taste;
 use App\Entity\User;
 use Doctrine\Bundle\FixturesBundle\Fixture;
@@ -82,10 +83,22 @@ class AppFixtures extends Fixture
 
         // Category, Bean and Taste
         for ($j=0; $j < 20; $j++) {
+
+            // TODO: Add a real file
+            // $loadedFile = new LoadedFile();
+            // $loadedFile->setRealName();
+            // $loadedFile->setOriginalFilename("coffee.jpg");
+            // $loadedFile->setMimeType("image/jpeg");
+            // $loadedFile->setSize(1000);
+            // $loadedFile->setCreatedAt($this->faker->dateTimeBetween("-1 week", "now"));
+            // $loadedFile->setUpdatedAt($this->faker->dateTimeBetween("-1 week", "now"));
+            // $loadedFile->setStatus("active");
+            // $manager->persist($loadedFile);
+
             $category = new Category();
             $category->setName("category ". $j);
-            $createdAt = $this->faker->dateTimeBetween("-1 week","now");
-            $updatedAt = $this->faker->dateTimeBetween($createdAt,"now");
+            $createdAt = $this->faker->dateTimeBetween("-1 week", "now");
+            $updatedAt = $this->faker->dateTimeBetween($createdAt, "now");
             $category->setCreatedAt($createdAt);
             $category->setUpdatedAt($updatedAt);
             $category->setStatus("active");
@@ -123,6 +136,8 @@ class AppFixtures extends Fixture
                 $ig->setStatus("active");
                 $ig->setCategory($category);
                 $ig->setBean($bean);
+                $ig->setTaste($taste);
+                // $ig->setCoffeeImage($loadedFile); // TODO
                 $manager->persist($ig);
             }
         }

@@ -31,19 +31,24 @@ class Taste extends SoftDeleteFields
     private ?string $name = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(["getTaste"])]
+    #[Groups(['getTaste'])]
     private ?string $description = null;
 
     #[ORM\Column]
-    #[Groups(["getTaste"])]
+    #[Groups(['getTaste'])]
     private ?int $intensity = null;
 
     #[ORM\Column]
-    #[Groups(["getTaste"])]
+    #[Groups(['getTaste'])]
     private ?float $caffeineRate = null;
 
-    #[ORM\OneToMany(mappedBy: 'taste', targetEntity: Coffee::class)]
-    #[Groups(["getTaste"])]
+    #[ORM\OneToMany(
+        mappedBy: 'taste',
+        targetEntity: Coffee::class,
+        cascade: ['persist', 'remove'],
+        orphanRemoval: true
+    )]
+    #[Groups(['getTaste'])]
     private Collection $coffees;
 
     public function __construct()

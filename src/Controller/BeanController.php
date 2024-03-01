@@ -65,6 +65,8 @@ class BeanController extends AbstractController
     public function getBean(int $id, SerializerInterface $serializer, BeanRepository $beanRepository): JsonResponse
     {
         $bean = $beanRepository->findActive($id);
+        if (!$bean) { throw $this->createNotFoundException('Bean not found'); }
+        
         $jsonBean = $serializer->serialize($bean, 'json', ['groups'=> 'getBean']);
         return new JsonResponse($jsonBean, JsonResponse::HTTP_OK, [], true);
     }
@@ -132,13 +134,14 @@ class BeanController extends AbstractController
         $errors = $validator->validate($updateBean);
         if ($errors->count())
         {
-            return new JsonResponse($serializer->serialize($errors,'json'), JsonResponse::HTTP_BAD_REQUEST, [], true);
+            return new JsonResponse($serializer->serialize($errors, 'json'), JsonResponse::HTTP_BAD_REQUEST, [], true);
         }
         $manager->persist($updateBean);
         $manager->flush();
-        $tagCache->invalidateTags(['beanCache']);
+        $tagCache->invalidateTags(['beanCache', 'coffeesCache']);
 
-        return new JsonResponse(null, JsonResponse::HTTP_NO_CONTENT);
+        $jsonBean = $serializer->serialize($updateBean, 'json', ['groups' => 'getBean']);
+        return new JsonResponse($jsonBean, JsonResponse::HTTP_OK, [], true);
     }
 
     /**

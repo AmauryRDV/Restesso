@@ -66,10 +66,12 @@ class CoffeeController extends AbstractController
         name: CoffeeController::CONTROLLER_NAME_PREFIX . 'get',
         methods: ['GET']
     )]
-    public function getCoffee(int $int, SerializerInterface $serializerInterface,
+    public function getCoffee(int $id, SerializerInterface $serializerInterface,
     CoffeeRepository $coffeeRepository): JsonResponse
     {
-        $coffee = $coffeeRepository->findActive($int);
+        $coffee = $coffeeRepository->findActive($id);
+        if (!$coffee) { throw $this->createNotFoundException('Coffee not found'); }
+
         $jsonCoffee = $serializerInterface->serialize($coffee, 'json', ['groups' => 'getCoffee']);
         return new JsonResponse($jsonCoffee, JsonResponse::HTTP_OK, [], true);
     }
@@ -167,10 +169,10 @@ class CoffeeController extends AbstractController
         // mettre à jour l'objet coffee pour mettre la date de création, d'update et le status
         $coffee->setUpdatedAt();
 
-        $errors = $validatorInterface->validate($coffee);
-        if (count($errors)) {
-            return new JsonResponse($serializerInterface->serialize($errors, 'json'), JsonResponse::HTTP_BAD_REQUEST);
-        }
+        // $errors = $validatorInterface->validate($coffee);
+        // if (count($errors)) {
+        //     return new JsonResponse($serializerInterface->serialize($errors, 'json'), JsonResponse::HTTP_BAD_REQUEST);
+        // }
 
         $manager->persist($coffee);
         $manager->flush();
@@ -201,7 +203,6 @@ class CoffeeController extends AbstractController
             $manager->remove($coffee);
         } else {
             $coffee->setStatus('active')->setUpdatedAt();
-    
             $manager->persist($coffee);
         }
 

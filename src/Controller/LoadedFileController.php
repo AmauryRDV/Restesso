@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\LoadedFile;
+use App\Repository\LoadedFileRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -13,39 +14,49 @@ use Symfony\Component\Serializer\SerializerInterface;
 
 class LoadedFileController extends AbstractController
 {
-    #[Route('/loaded/file', name: 'app_loaded_file')]
-    public function index(): JsonResponse
-    {
-        return $this->json([
-            'message' => 'Welcome to your new controller!',
-            'path' => 'src/Controller/LoadedFileController.php',
-        ]);
-    }
+    private const API_GATEWAY = '/api/v1';
+    private const CONTROLLER_NAME_PREFIX = 'loadedFile_';
 
-    #[Route('/api/files', name: 'loadedFile.getAll', methods: ['GET'])]
-    public function getAllLoadedFiles(EntityManagerInterface $entityManagerInterface,
-    SerializerInterface $serializerInterface): JsonResponse
+    #[Route(
+        LoadedFileController::API_GATEWAY . '/files',
+        name: LoadedFileController::CONTROLLER_NAME_PREFIX . 'getAll',
+        methods: ['GET']
+    )]
+    public function getAllLoadedFiles(SerializerInterface $serializerInterface,
+    LoadedFileRepository $loadedFileRepository): JsonResponse
     {
-        $loadedFiles = $entityManagerInterface->getRepository(LoadedFile::class)->findAll();
+        $loadedFiles = $loadedFileRepository->findAllActive();
         $jsonFiles = $serializerInterface->serialize($loadedFiles, 'json');
         return new JsonResponse($jsonFiles, JsonResponse::HTTP_OK, [], true);
     }
 
-    #[Route('/api/files/{id}', name: 'loadedFile.get', methods: ['GET'])]
-    public function getLoadedFile(LoadedFile $loadedFile, SerializerInterface $serializerInterface,
-    UrlGeneratorInterface $urlGeneratorInterface): JsonResponse
+    #[Route(
+        LoadedFileController::API_GATEWAY . '/files/{id}',
+        name: LoadedFileController::CONTROLLER_NAME_PREFIX . 'get',
+        methods: ['GET']
+    )]
+    public function getLoadedFile(int $id, SerializerInterface $serializerInterface,
+    UrlGeneratorInterface $urlGeneratorInterface, LoadedFileRepository $loadedFileRepository): JsonResponse
     {
+        $loadedFile = $loadedFileRepository->findActive($id);
         $loadedFiles = $loadedFile->getPublicPath();
-        $location = $urlGeneratorInterface->generate('loadedFile.create', [], UrlGeneratorInterface::ABSOLUTE_URL);
+        $location = $urlGeneratorInterface->generate(
+            LoadedFileController::CONTROLLER_NAME_PREFIX . 'create',
+            [], UrlGeneratorInterface::ABSOLUTE_URL
+        );
         $location = $location . str_replace('/public', '', $loadedFiles . '/' . $loadedFile->getRealPath());
 
-        $jsonFiles = $serializerInterface->serialize($loadedFile, 'json');
+        $jsonFiles = $serializerInterface->serialize($loadedFile, 'json', ['groups' => 'getLoadedFile']);
         return $jsonFiles ?
         new JsonResponse($jsonFiles, JsonResponse::HTTP_OK, ['Location' => $location], true) :
         new JsonResponse(null, JsonResponse::HTTP_NOT_FOUND);
     }
 
-    #[Route('/api/files', name: 'loadedFile.create', methods: ['POST'])]
+    #[Route(
+        LoadedFileController::API_GATEWAY . '/files',
+        name: LoadedFileController::CONTROLLER_NAME_PREFIX . 'create',
+        methods: ['POST']
+    )]
     public function createLoadedFile(Request $request, EntityManagerInterface $entityManagerInterface,
     SerializerInterface $serializerInterface, UrlGeneratorInterface $urlGeneratorInterface): JsonResponse
     {
@@ -57,7 +68,7 @@ class LoadedFileController extends AbstractController
         $loadedFile->setName($file->getClientOriginalName());
         $loadedFile->setMimeType($file->getMimeType());
         $loadedFile->setPublicPath("/public/medias/pictures");
-        $loadedFile->setCreatedAt()->setUpdatedAt()->setStatus('on');
+        $loadedFile->setCreatedAt()->setUpdatedAt()->setStatus('active');
 
         $entityManagerInterface->persist($loadedFile);
         $entityManagerInterface->flush();

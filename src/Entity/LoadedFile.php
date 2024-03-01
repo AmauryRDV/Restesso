@@ -3,10 +3,13 @@
 namespace App\Entity;
 
 use App\Repository\LoadedFileRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Vich\UploaderBundle\Mapping\Annotation as Vich;
 use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: LoadedFileRepository::class)]
 class LoadedFile extends SoftDeleteFields
@@ -14,25 +17,40 @@ class LoadedFile extends SoftDeleteFields
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['getLoadedFile', 'getCoffee'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['getLoadedFile', 'getCoffee'])]
+    private ?string $name = null;
+
+    #[ORM\Column(length: 255)]
+    #[Groups(['getLoadedFile'])]
     private ?string $realName = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['getLoadedFile'])]
     private ?string $realPath = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['getLoadedFile'])]
     private ?string $publicPath = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['getLoadedFile'])]
     private ?string $mimeType = null;
 
     #[Vich\UploadableField(mapping:'pictures', fileNameProperty:'realPath')]
     private $file;
+    
+    #[ORM\OneToMany(mappedBy: 'coffeeImage', targetEntity: Coffee::class)]
+    #[Groups(['getLoadedFile'])]
+    private Collection $coffees;
 
-    #[ORM\Column(length: 255)]
-    private ?string $name = null;
+    public function __construct()
+    {
+        $this->coffees = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -107,6 +125,33 @@ class LoadedFile extends SoftDeleteFields
     public function setName(string $name): static
     {
         $this->name = $name;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Coffee>
+     */
+    public function getCoffees(): Collection
+    {
+        return $this->coffees;
+    }
+
+    public function addCoffee(Coffee $coffee): static
+    {
+        if (!$this->coffees->contains($coffee)) {
+            $this->coffees->add($coffee);
+            $coffee->setCoffeeImage($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCoffee(Coffee $coffee): static
+    {
+        if ($this->coffees->removeElement($coffee) && $coffee->getCoffeeImage() === $this) {
+            $coffee->setCoffeeImage(null);
+        }
 
         return $this;
     }

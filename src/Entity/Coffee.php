@@ -14,11 +14,11 @@ class Coffee extends SoftDeleteFields
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['getCoffee', 'getTaste', 'getCategory', 'getBean'])]
+    #[Groups(['getCoffee', 'getTaste', 'getCategory', 'getBean', 'getLoadedFile'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(["getCoffee"])]
+    #[Groups(['getCoffee', 'getTaste', 'getCategory', 'getBean', 'getLoadedFile'])]
     #[Assert\Length(
         min: 3,
         max: 255,
@@ -35,11 +35,16 @@ class Coffee extends SoftDeleteFields
     #[Groups(['getCoffee'])]
     private ?Category $category = null;
 
-    #[ORM\ManyToOne(inversedBy: 'coffees')]
+    #[ORM\ManyToOne(inversedBy: 'coffees', targetEntity: Taste::class, cascade: ['persist'])]
+    #[Groups(['getCoffee'])]
     private ?Taste $taste = null;
 
     #[ORM\ManyToOne(inversedBy: 'coffees')]
+    #[Groups(['getCoffee'])]
     private ?Bean $bean = null;
+
+    #[ORM\ManyToOne(inversedBy: 'coffees')]
+    private ?LoadedFile $coffeeImage = null;
 
     public function getId(): ?int
     {
@@ -102,6 +107,18 @@ class Coffee extends SoftDeleteFields
     public function setBean(?Bean $bean): static
     {
         $this->bean = $bean;
+
+        return $this;
+    }
+
+    public function getCoffeeImage(): ?LoadedFile
+    {
+        return $this->coffeeImage;
+    }
+
+    public function setCoffeeImage(?LoadedFile $coffeeImage): static
+    {
+        $this->coffeeImage = $coffeeImage;
 
         return $this;
     }

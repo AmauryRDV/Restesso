@@ -71,6 +71,8 @@ class CategoryController extends AbstractController
     CategoryRepository $categoryRepository): JsonResponse
     {
         $category = $categoryRepository->findActive($id);
+        if (!$category) { throw $this->createNotFoundException('Category not found'); }
+        
         $jsonCategory = $serializer->serialize($category, 'json', ['groups'=> 'getCategory']);
         return new JsonResponse($jsonCategory, JsonResponse::HTTP_OK, [], true);
     }
@@ -129,12 +131,12 @@ class CategoryController extends AbstractController
         name: CategoryController::CONTROLLER_NAME_PREFIX . 'update',
         methods: ['PUT']
     )]
-    public function updateCategory(Category $updateCategory,TagAwareCacheInterface $cache,ValidatorInterface $validator,
-    Request $request, SerializerInterface $serializer, EntityManagerInterface $manager)
+    public function updateCategory(Category $updateCategory, TagAwareCacheInterface $cache,
+    ValidatorInterface $validator, Request $request, SerializerInterface $serializer, EntityManagerInterface $manager)
     {
         $updateCategory = $serializer->deserialize(
             $request->getContent(),
-            Category::class,'json',
+            Category::class, 'json',
             [AbstractNormalizer::OBJECT_TO_POPULATE => $updateCategory]
         );
 
@@ -153,8 +155,9 @@ class CategoryController extends AbstractController
         $manager->persist($updateCategory);
         $manager->flush();
 
-        $cache->invalidateTags(['categoryCache']);
-        return new JsonResponse(null, JsonResponse::HTTP_NO_CONTENT);
+        $cache->invalidateTags(['categoryCache', 'coffeesCache']);
+        $jsonCategory = $serializer->serialize($updateCategory, 'json', ['groups' => 'getCategory']);
+        return new JsonResponse($jsonCategory, JsonResponse::HTTP_OK, [], true);
     }
 
     /**

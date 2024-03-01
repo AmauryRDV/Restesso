@@ -70,6 +70,8 @@ class TasteController extends AbstractController
     TasteRepository $tasteRepository): JsonResponse
     {
         $taste = $tasteRepository->findActive($id);
+        if (!$taste) { throw $this->createNotFoundException('Taste not found'); }
+        
         $jsonTaste = $serializerInterface->serialize($taste, 'json', ['groups' => 'getTaste']);
         return new JsonResponse($jsonTaste, JsonResponse::HTTP_OK, [], true);
     }
@@ -169,7 +171,7 @@ class TasteController extends AbstractController
         $manager->persist($taste);
         $manager->flush();
 
-        $tagAwareCacheInterface->invalidateTags(['tastesCache']);
+        $tagAwareCacheInterface->invalidateTags(['tastesCache', 'coffeesCache']);
 
         $jsonTaste = $serializerInterface->serialize($taste, 'json', ['groups' => 'getTaste']);
         return new JsonResponse($jsonTaste, JsonResponse::HTTP_OK, [], true);
