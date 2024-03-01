@@ -137,13 +137,13 @@ class CoffeeController extends AbstractController
      * @OA\Parameter(name="description", in="query", description="Description of the coffee", required=false,
      *  @OA\Schema(type="string")
      * )
-     * @OA\Parameter(name="category", in="query", description="ID of the category", required=false,
+     * @OA\Parameter(name="category_id", in="query", description="ID of the category", required=false,
      *  @OA\Schema(type="integer")
      * )
-     * @OA\Parameter(name="bean", in="query", description="ID of the bean", required=false,
+     * @OA\Parameter(name="bean_id", in="query", description="ID of the bean", required=false,
      *  @OA\Schema(type="integer")
      * )
-     * @OA\Parameter(name="taste", in="query", description="ID of the taste", required=false,
+     * @OA\Parameter(name="taste_id", in="query", description="ID of the taste", required=false,
      *  @OA\Schema(type="string")
      * )
      * @OA\Tag(name="Coffee")
@@ -157,7 +157,7 @@ class CoffeeController extends AbstractController
     EntityManagerInterface $manager, ValidatorInterface $validatorInterface,
     TagAwareCacheInterface $tagAwareCacheInterface): JsonResponse
     {
-        $serializerInterface->deserialize(
+        $coffee = $serializerInterface->deserialize(
             $request->getContent(),
             Coffee::class,
             'json',
@@ -167,10 +167,10 @@ class CoffeeController extends AbstractController
         // mettre à jour l'objet coffee pour mettre la date de création, d'update et le status
         $coffee->setUpdatedAt();
 
-        // $errors = $validatorInterface->validate($coffee);
-        // if (count($errors)) {
-        //     return new JsonResponse($serializerInterface->serialize($errors, 'json'), JsonResponse::HTTP_BAD_REQUEST);
-        // }
+        $errors = $validatorInterface->validate($coffee);
+        if (count($errors)) {
+            return new JsonResponse($serializerInterface->serialize($errors, 'json'), JsonResponse::HTTP_BAD_REQUEST);
+        }
 
         $manager->persist($coffee);
         $manager->flush();
@@ -185,7 +185,7 @@ class CoffeeController extends AbstractController
      * This method soft delete a Coffee with the ID, can be forced.
      * @OA\Parameter(name="id", in="path", description="Id of the coffee", required=true, @OA\Schema(type="integer"))
      * @OA\Parameter(name="isForced", in="path", description="Force or not the delete of a coffee", required=true,
-     *  @OA\Schema(type="Bool")
+     *  @OA\Schema(type="string", enum={"1", "true", "oui", "yes", "forced", "vrai", "force"})
      * )
      * @OA\Tag(name="Coffee")
      */
@@ -194,13 +194,14 @@ class CoffeeController extends AbstractController
         name: CoffeeController::CONTROLLER_NAME_PREFIX . 'delete_forced',
         methods: ['DELETE']
     )]
-    public function deleteCoffeeIsForced(Coffee $coffee, Bool $isForced, EntityManagerInterface $manager,
+    public function deleteCoffeeIsForced(Coffee $coffee, string $isForced, EntityManagerInterface $manager,
     TagAwareCacheInterface $tagAwareCacheInterface): Response
     {
+        $isForced = in_array(strtolower($isForced), ['1', 'true', 'oui', 'yes', 'forced', 'vrai', 'force']);
         if ($isForced) {
             $manager->remove($coffee);
         } else {
-            $coffee->setStatus('active')->setUpdatedAt();
+            $coffee->setStatus('inactive')->setUpdatedAt();
             $manager->persist($coffee);
         }
 

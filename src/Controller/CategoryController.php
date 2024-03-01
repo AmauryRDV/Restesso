@@ -164,7 +164,7 @@ class CategoryController extends AbstractController
      * This method soft delete a Category with the ID, can be forced.
      * @OA\Parameter(name="id", in="path", description="Id of the category", required=true, @OA\Schema(type="integer"))
      * @OA\Parameter(name="isForced", in="path", description="Disable or Delete a category", required=true,
-     *  @OA\Schema(type="Bool")
+     *  @OA\Schema(type="string", enum={"1", "true", "oui", "yes", "forced", "vrai", "force"})
      * )
      * @OA\Tag(name="Category")
      */
@@ -173,15 +173,15 @@ class CategoryController extends AbstractController
         name: CategoryController::CONTROLLER_NAME_PREFIX . 'delete_forced',
         methods: ['DELETE']
     )]
-    public function deleteCategoryIsForced(Category $category, TagAwareCacheInterface $cache, Bool $isForced,
+    public function deleteCategoryIsForced(Category $category, TagAwareCacheInterface $cache, string $isForced,
     EntityManagerInterface $manager): Response
     {
         $tagToInvalidate = ['categoryCache'];
-        if ($isForced) {
+        $forcedVar = ['1', 'true', 'oui', 'yes', 'forced', 'vrai', 'force'];
+
+        if (in_array(strtolower($isForced), $forcedVar)) {
             $coffees=$category->getCoffees();
             foreach($coffees as $coffee) {
-                $category->removeCoffee($coffee);
-
                 $coffee->setCategory(null);
                 $coffee->setUpdatedAt();
                 $coffee->setStatus('inactive');

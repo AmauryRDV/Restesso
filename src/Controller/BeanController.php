@@ -41,7 +41,7 @@ class BeanController extends AbstractController
         $jsonBeans = $cache->get($idCacheGetAllBeans, function (ItemInterface $item) use ($beanRep, $serializer)
         {
             $item->tag("beanCache");
-            $beans = $beanRep->findAll();
+            $beans = $beanRep->findAllActive();
             return  $serializer->serialize($beans, 'json', ['groups'=> "getAllBeans"]);
         });
     
@@ -147,7 +147,7 @@ class BeanController extends AbstractController
     * This method soft delete a Bean with the ID, can be forced.
     * @OA\Parameter(name="id", in="path", description="Id of the bean", required=true, @OA\Schema(type="integer"))
     * @OA\Parameter(name="isForced", in="path", description="Disable or Delete a bean", required=true,
-    *  @OA\Schema(type="Bool")
+    *  @OA\Schema(type="string", enum={"1", "true", "oui", "yes", "forced", "vrai", "force"})
     * )
     * @OA\Tag(name="Bean")
     */
@@ -156,25 +156,23 @@ class BeanController extends AbstractController
         name: BeanController::CONTROLLER_NAME_PREFIX . 'delete_forced',
         methods: ['DELETE']
     )]
-    public function deleteBeanIsForced(Bean $bean, Bool $isforced, EntityManagerInterface $manager,
+    public function deleteBeanIsForced(Bean $bean, string $isForced, EntityManagerInterface $manager,
     TagAwareCacheInterface $tagAwareCacheInterface): JsonResponse
     {
         $tagToInvalidate = ['beanCache'];
+        $forcedVar = ['1', 'true', 'oui', 'yes', 'forced', 'vrai', 'force'];
 
-        if ($isforced) {
-            $coffees=$bean->getCoffees();
+        if (in_array(strtolower($isForced), $forcedVar)) {
+            echo 'isForced true';
+            $coffees = $bean->getCoffees();
             foreach($coffees as $coffee) {
                 $coffee->setBean(null);
                 $coffee->setUpdatedAt();
                 $coffee->setStatus('inactive');
 
-                $bean->removeCoffee($coffee);
-
                 $manager->persist($coffee);
             }
             $manager->remove($bean);
-
-            $tagToInvalidate[] = 'coffeesCache';
         } else {
             $bean->setUpdatedAt()->setStatus('inactive');
             $manager->persist($bean);

@@ -45,8 +45,6 @@ class Taste extends SoftDeleteFields
     #[ORM\OneToMany(
         mappedBy: 'taste',
         targetEntity: Coffee::class,
-        cascade: ['persist', 'remove'],
-        orphanRemoval: true
     )]
     #[Groups(['getTaste'])]
     private Collection $coffees;

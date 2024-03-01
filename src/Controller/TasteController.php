@@ -179,7 +179,7 @@ class TasteController extends AbstractController
      * This method soft delete a Taste with the ID, can be forced.
      * @OA\Parameter(name="id", in="path", description="Id of the taste", required=true, @OA\Schema(type="integer"))
      * @OA\Parameter(name="isForced", in="path", description="Force or not the delete of a taste", required=true,
-     *  @OA\Schema(type="Bool")
+     *  @OA\Schema(type="string", enum={"1", "true", "oui", "yes", "forced", "vrai", "force"})
      * )
      * @OA\Tag(name="Taste")
      */
@@ -188,15 +188,15 @@ class TasteController extends AbstractController
         name: TasteController::CONTROLLER_NAME_PREFIX . 'delete_forced',
         methods: ['DELETE']
     )]
-    public function deleteTasteIsForced(Taste $taste, Bool $isForced, EntityManagerInterface $manager,
+    public function deleteTasteIsForced(Taste $taste, string $isForced, EntityManagerInterface $manager,
     TagAwareCacheInterface $tagAwareCacheInterface): Response
     {
         $tagToInvalidate = ['tastesCache'];
-        if ($isForced) {
+        $forcedVar = ['1', 'true', 'oui', 'yes', 'forced', 'vrai', 'force'];
+
+        if (in_array(strtolower($isForced), $forcedVar)) {
             $coffees = $taste->getCoffees();
             foreach($coffees as $coffee) {
-                $taste->removeCoffee($coffee);
-
                 $coffee->setCategory(null);
                 $coffee->setUpdatedAt();
                 $coffee->setStatus('inactive');
