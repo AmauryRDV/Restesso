@@ -27,7 +27,7 @@ class TasteController extends AbstractController
     /**
      * This method return all the tastes availables.
      * @OA\Response(response=200, description="Return tastes",
-     *  @OA\JsonContent(type="array", @OA\Items(ref=@Model(type=Taste::class, groups={"getTaste"})))
+     *  @OA\JsonContent(type="array", @OA\Items(ref=@Model(type=Taste::class, groups={"getAllTasteS"})))
      * )
      * @OA\Tag(name="Taste")
      */
@@ -39,18 +39,16 @@ class TasteController extends AbstractController
     public function getAllTastes(TasteRepository $tasteRepository, SerializerInterface $serializerInterface,
     TagAwareCacheInterface $tagAwareCacheInterface): JsonResponse
     {
-        $tagAwareCacheInterface->get('getAllTastesCache',
+        $tastes = $tagAwareCacheInterface->get('getAllTastesCache',
             function (ItemInterface $itemInterface) use ($tasteRepository, $serializerInterface)
             {
                 $itemInterface->tag(['tastesCache']);
                 $tastes = $tasteRepository->findAllActive();
-                return $serializerInterface->serialize($tastes, 'json', ['groups' => 'getTaste']);
+                return $serializerInterface->serialize($tastes, 'json', ['groups' => 'getAllTastes']);
             }
         );
 
-        $tastes = $tasteRepository->findAllActive();
-        $jsonTastes = $serializerInterface->serialize($tastes, 'json', ['groups' => 'getTaste']);
-        return new JsonResponse($jsonTastes, JsonResponse::HTTP_OK, [], true);
+        return new JsonResponse($tastes, JsonResponse::HTTP_OK, [], true);
     }
 
     /**

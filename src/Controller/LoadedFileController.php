@@ -26,7 +26,7 @@ class LoadedFileController extends AbstractController
     LoadedFileRepository $loadedFileRepository): JsonResponse
     {
         $loadedFiles = $loadedFileRepository->findAllActive();
-        $jsonFiles = $serializerInterface->serialize($loadedFiles, 'json');
+        $jsonFiles = $serializerInterface->serialize($loadedFiles, 'json', ['groups' => 'getAllLoadedFiles']);
         return new JsonResponse($jsonFiles, JsonResponse::HTTP_OK, [], true);
     }
 

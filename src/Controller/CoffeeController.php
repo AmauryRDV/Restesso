@@ -27,7 +27,7 @@ class CoffeeController extends AbstractController
     /**
      * This method return all the coffees availables.
      * @OA\Response(response=200, description="Return coffees",
-     *  @OA\JsonContent(type="array", @OA\Items(ref=@Model(type=Coffee::class, groups={"getCoffee"})))
+     *  @OA\JsonContent(type="array", @OA\Items(ref=@Model(type=Coffee::class, groups={"getAllCoffees"})))
      * )
      * @OA\Tag(name="Coffee")
      */
@@ -39,18 +39,16 @@ class CoffeeController extends AbstractController
     public function getAllCoffees(CoffeeRepository $coffeeRepository, SerializerInterface $serializerInterface,
     TagAwareCacheInterface $tagAwareCacheInterface): JsonResponse
     {
-        $tagAwareCacheInterface->get('getAllCoffeesCache',
+        $coffees = $tagAwareCacheInterface->get('getAllCoffeesCache',
             function (ItemInterface $itemInterface) use ($coffeeRepository, $serializerInterface)
             {
                 $itemInterface->tag(['coffeesCache']);
                 $coffees = $coffeeRepository->findAllActive();
-                return $serializerInterface->serialize($coffees, 'json', ['groups' => 'getCoffee']);
+                return $serializerInterface->serialize($coffees, 'json', ['groups' => 'getAllCoffees']);
             }
         );
 
-        $coffees = $coffeeRepository->findAllActive();
-        $jsonCoffees = $serializerInterface->serialize($coffees, 'json', ['groups' => 'getCoffee']);
-        return new JsonResponse($jsonCoffees, JsonResponse::HTTP_OK, [], true);
+        return new JsonResponse($coffees, JsonResponse::HTTP_OK, [], true);
     }
 
     /**

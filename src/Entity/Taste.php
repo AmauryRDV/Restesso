@@ -16,7 +16,7 @@ class Taste extends SoftDeleteFields
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['getTaste', 'getCoffee'])]
+    #[Groups(['getTaste', 'getCoffee', 'getAllTastes'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
@@ -27,19 +27,19 @@ class Taste extends SoftDeleteFields
         maxMessage: 'The name cannot be longer than {{ limit }} characters',
 
     )]
-    #[Groups(['getTaste', 'getCoffee'])]
+    #[Groups(['getTaste', 'getCoffee', 'getAllTastes'])]
     private ?string $name = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['getTaste'])]
+    #[Groups(['getTaste', 'getAllTastes'])]
     private ?string $description = null;
 
     #[ORM\Column]
-    #[Groups(['getTaste'])]
+    #[Groups(['getTaste', 'getAllTastes'])]
     private ?int $intensity = null;
 
     #[ORM\Column]
-    #[Groups(['getTaste'])]
+    #[Groups(['getTaste', 'getAllTastes'])]
     private ?float $caffeineRate = null;
 
     #[ORM\OneToMany(

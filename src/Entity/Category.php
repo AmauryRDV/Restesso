@@ -15,11 +15,11 @@ class Category extends SoftDeleteFields
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['getCoffee', 'getCategory'])]
+    #[Groups(['getCoffee', 'getCategory', 'getAllCategories'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['getCategory', 'getCoffee'])]
+    #[Groups(['getCategory', 'getCoffee', 'getAllCategories'])]
     #[Assert\Length(
         min : 2,
         max : 100,

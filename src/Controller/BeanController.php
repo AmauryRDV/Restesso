@@ -26,7 +26,7 @@ class BeanController extends AbstractController
     /**
      * This method return all the beans availables.
      * @OA\Response(response=200, description="Return beans list",
-     *  @OA\JsonContent(type="array", @OA\Items(ref=@Model(type=Bean::class, groups={"getBean"})))
+     *  @OA\JsonContent(type="array", @OA\Items(ref=@Model(type=Bean::class, groups={"getAllBeans"})))
      * )
      * @OA\Tag(name="Bean")
      */
@@ -38,13 +38,12 @@ class BeanController extends AbstractController
     public function getAllBeans(BeanRepository $beanRep, SerializerInterface $serializer, TagAwareCacheInterface $cache)
     {
         $idCacheGetAllBeans = "getAllBeansCache";
-            $jsonBeans = $cache->get($idCacheGetAllBeans, function (ItemInterface $item) use ($beanRep, $serializer)
-            {
-                $item->tag("beanCache");
-                $beans = $beanRep->findAll();
-                return  $serializer->serialize($beans, 'json', ['groups'=> "getBean"]);
-            }
-        );
+        $jsonBeans = $cache->get($idCacheGetAllBeans, function (ItemInterface $item) use ($beanRep, $serializer)
+        {
+            $item->tag("beanCache");
+            $beans = $beanRep->findAll();
+            return  $serializer->serialize($beans, 'json', ['groups'=> "getAllBeans"]);
+        });
     
         return new JsonResponse($jsonBeans, JsonResponse::HTTP_OK, [], true);
     }

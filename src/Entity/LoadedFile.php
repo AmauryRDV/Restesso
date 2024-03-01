@@ -17,27 +17,27 @@ class LoadedFile extends SoftDeleteFields
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['getLoadedFile', 'getCoffee'])]
+    #[Groups(['getLoadedFile', 'getCoffee', 'getAllLoadedFiles'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['getLoadedFile', 'getCoffee'])]
+    #[Groups(['getLoadedFile', 'getCoffee', 'getAllLoadedFiles'])]
     private ?string $name = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['getLoadedFile'])]
+    #[Groups(['getLoadedFile', 'getAllLoadedFiles'])]
     private ?string $realName = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['getLoadedFile'])]
+    #[Groups(['getLoadedFile', 'getAllLoadedFiles'])]
     private ?string $realPath = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['getLoadedFile'])]
+    #[Groups(['getLoadedFile', 'getAllLoadedFiles'])]
     private ?string $publicPath = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['getLoadedFile'])]
+    #[Groups(['getLoadedFile', 'getAllLoadedFiles'])]
     private ?string $mimeType = null;
 
     #[Vich\UploadableField(mapping:'pictures', fileNameProperty:'realPath')]

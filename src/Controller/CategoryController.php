@@ -29,7 +29,7 @@ class CategoryController extends AbstractController
     /**
      * This method return all the categories availables.
      * @OA\Response(response=200, description="Return categories",
-     *  @OA\JsonContent(type="array", @OA\Items(ref=@Model(type=Category::class, groups={"getCategory"})))
+     *  @OA\JsonContent(type="array", @OA\Items(ref=@Model(type=Category::class, groups={"getAllCategories"})))
      * )
      * @OA\Tag(name="Category")
      */
@@ -47,7 +47,7 @@ class CategoryController extends AbstractController
             function (ItemInterface $item) use ($categoryRep, $serializer) {
                 $item->tag("categoryCache");
                 $categories = $categoryRep->findAllActive();
-                return  $serializer->serialize($categories, 'json', ['groups'=> "getCategory"]);
+                return  $serializer->serialize($categories, 'json', ['groups'=> 'getAllCategories']);
             }
         );
         
