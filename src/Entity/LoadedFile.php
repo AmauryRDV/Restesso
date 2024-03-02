@@ -3,45 +3,54 @@
 namespace App\Entity;
 
 use App\Repository\LoadedFileRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Vich\UploaderBundle\Mapping\Annotation as Vich;
 use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: LoadedFileRepository::class)]
-class LoadedFile
+class LoadedFile extends SoftDeleteFields
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['getLoadedFile', 'getCoffee', 'getAllLoadedFiles'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['getLoadedFile', 'getCoffee', 'getAllLoadedFiles'])]
+    private ?string $name = null;
+
+    #[ORM\Column(length: 255)]
+    #[Groups(['getLoadedFile', 'getAllLoadedFiles'])]
     private ?string $realName = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['getLoadedFile', 'getAllLoadedFiles'])]
     private ?string $realPath = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['getLoadedFile', 'getAllLoadedFiles'])]
     private ?string $publicPath = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['getLoadedFile', 'getAllLoadedFiles'])]
     private ?string $mimeType = null;
-
-    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    private ?\DateTimeInterface $updatedAt = null;
-
-    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    private ?\DateTimeInterface $createdAt = null;
-
-    #[ORM\Column(length: 255)]
-    private ?string $status = null;
 
     #[Vich\UploadableField(mapping:'pictures', fileNameProperty:'realPath')]
     private $file;
+    
+    #[ORM\OneToMany(mappedBy: 'coffeeImage', targetEntity: Coffee::class)]
+    #[Groups(['getLoadedFile'])]
+    private Collection $coffees;
 
-    #[ORM\Column(length: 255)]
-    private ?string $name = null;
+    public function __construct()
+    {
+        $this->coffees = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -96,42 +105,6 @@ class LoadedFile
         return $this;
     }
 
-    public function getUpdatedAt(): ?\DateTimeInterface
-    {
-        return $this->updatedAt;
-    }
-
-    public function setUpdatedAt(?\DateTimeInterface $updatedAt = null): static
-    {
-        $this->updatedAt = $updatedAt != null ? $updatedAt: new \DateTime();
-
-        return $this;
-    }
-
-    public function getCreatedAt(): ?\DateTimeInterface
-    {
-        return $this->createdAt;
-    }
-
-    public function setCreatedAt(?\DateTimeInterface $createdAt = null): static
-    {
-        $this->createdAt = $createdAt != null ? $createdAt: new \DateTime();
-
-        return $this;
-    }
-
-    public function getStatus(): ?string
-    {
-        return $this->status;
-    }
-
-    public function setStatus(string $status): static
-    {
-        $this->status = $status;
-
-        return $this;
-    }
-
     public function getFile(): ?File
     {
         return $this->file;
@@ -152,6 +125,33 @@ class LoadedFile
     public function setName(string $name): static
     {
         $this->name = $name;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Coffee>
+     */
+    public function getCoffees(): Collection
+    {
+        return $this->coffees;
+    }
+
+    public function addCoffee(Coffee $coffee): static
+    {
+        if (!$this->coffees->contains($coffee)) {
+            $this->coffees->add($coffee);
+            $coffee->setCoffeeImage($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCoffee(Coffee $coffee): static
+    {
+        if ($this->coffees->removeElement($coffee) && $coffee->getCoffeeImage() === $this) {
+            $coffee->setCoffeeImage(null);
+        }
 
         return $this;
     }

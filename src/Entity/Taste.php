@@ -5,42 +5,49 @@ namespace App\Entity;
 use App\Repository\TasteRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
+
 
 #[ORM\Entity(repositoryClass: TasteRepository::class)]
-class Taste
+class Taste extends SoftDeleteFields
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['getTaste', 'getCoffee', 'getAllTastes'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\Length(
+        min : 2,
+        max : 100,
+        minMessage : 'The name must be at least {{ limit }} characters long',
+        maxMessage: 'The name cannot be longer than {{ limit }} characters',
+
+    )]
+    #[Groups(['getTaste', 'getCoffee', 'getAllTastes'])]
     private ?string $name = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['getTaste', 'getAllTastes'])]
     private ?string $description = null;
 
     #[ORM\Column]
+    #[Groups(['getTaste', 'getAllTastes'])]
     private ?int $intensity = null;
 
     #[ORM\Column]
+    #[Groups(['getTaste', 'getAllTastes'])]
     private ?float $caffeineRate = null;
 
     #[ORM\OneToMany(
         mappedBy: 'taste',
         targetEntity: Coffee::class,
-        cascade: ['persist', 'remove'],
-        orphanRemoval: true
     )]
+    #[Groups(['getTaste'])]
     private Collection $coffees;
-
-    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    private ?\DateTimeInterface $updatedAt = null;
-
-    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    private ?\DateTimeInterface $createdAt = null;
 
     public function __construct()
     {
@@ -124,30 +131,6 @@ class Taste
             // set the owning side to null (unless already changed)
             $coffee->setTaste(null);
         }
-
-        return $this;
-    }
-
-    public function getUpdatedAt(): ?\DateTimeInterface
-    {
-        return $this->updatedAt;
-    }
-
-    public function setUpdatedAt(\DateTimeInterface $updatedAt): static
-    {
-        $this->updatedAt = $updatedAt;
-
-        return $this;
-    }
-
-    public function getCreatedAt(): ?\DateTimeInterface
-    {
-        return $this->createdAt;
-    }
-
-    public function setCreatedAt(\DateTimeInterface $createdAt): static
-    {
-        $this->createdAt = $createdAt;
 
         return $this;
     }

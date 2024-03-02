@@ -21,28 +21,23 @@ class LoadedFileRepository extends ServiceEntityRepository
         parent::__construct($registry, LoadedFile::class);
     }
 
-//    /**
-//     * @return LoadedFile[] Returns an array of LoadedFile objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('l')
-//            ->andWhere('l.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('l.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
+    public function findActive(int $id): ?LoadedFile
+    {
+        return $this->createQueryBuilder('loadedFile')
+            ->andWhere('loadedFile.id = :id')
+            ->andWhere("loadedFile.status='active'")
+            ->setParameter('id', $id)
+            ->getQuery()
+            ->getOneOrNullResult()
+        ;
+    }
 
-//    public function findOneBySomeField($value): ?LoadedFile
-//    {
-//        return $this->createQueryBuilder('l')
-//            ->andWhere('l.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
+    public function findAllActive(): array
+    {
+        return $this->createQueryBuilder('loadedFile')
+            ->andWhere("loadedFile.status='active'")
+            ->getQuery()
+            ->getResult()
+        ;
+    }
 }

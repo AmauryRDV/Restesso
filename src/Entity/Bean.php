@@ -8,36 +8,42 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
+
 
 #[ORM\Entity(repositoryClass: BeanRepository::class)]
-class Bean
+class Bean extends SoftDeleteFields
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(["getCoffee", "getBean"])]
-
+    #[Groups(['getCoffee', 'getBean', 'getAllBeans'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 100)]
-    #[Groups(["getCoffee", "getBean"])]
+    #[Groups(['getBean', 'getCoffee', 'getAllBeans'])]
+    #[Assert\Length(
+        min : 2,
+        max : 100,
+        minMessage : 'The name must be at least {{ limit }} characters long',
+        maxMessage: 'The name cannot be longer than {{ limit }} characters',
+
+    )]
     private ?string $name = null;
 
     #[ORM\Column(length: 200, nullable: true)]
-    #[Groups(["getCoffee", "getBean"])]
+    #[Groups(['getBean', 'getAllBeans'])]
     private ?string $origin = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
-    #[Groups(["getCoffee", "getBean"])]
-
+    #[Groups(['getBean', 'getAllBeans'])]
     private ?string $description = null;
 
     #[ORM\OneToMany(
         mappedBy: 'bean',
         targetEntity: Coffee::class,
-        cascade: ['persist', 'remove'],
-        orphanRemoval: true
     )]
+    #[Groups(['getBean'])]
     private Collection $coffees;
 
     public function __construct()
@@ -85,10 +91,6 @@ class Bean
 
         return $this;
     }
-
-
-    
-    
 
     /**
      * @return Collection<int, Coffee>

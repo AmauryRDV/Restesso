@@ -5,22 +5,21 @@ namespace App\Entity;
 use App\Repository\CategoryRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: CategoryRepository::class)]
-class Category
+class Category extends SoftDeleteFields
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(["getCoffee", "getCategory"])]
+    #[Groups(['getCoffee', 'getCategory', 'getAllCategories'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(["getCategory"])]
+    #[Groups(['getCategory', 'getCoffee', 'getAllCategories'])]
     #[Assert\Length(
         min : 2,
         max : 100,
@@ -30,24 +29,9 @@ class Category
     )]
     private ?string $name = null;
 
-    #[ORM\OneToMany(
-        mappedBy: 'category',
-        targetEntity: Coffee::class,
-        cascade: ['persist', 'remove'],
-        orphanRemoval: true
-    )]
+    #[ORM\OneToMany(mappedBy: 'category', targetEntity: Coffee::class)]
+    #[Groups(['getCategory'])]
     private Collection $coffees;
-
-    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    #[Groups(["getCategory"])]
-    private ?\DateTimeInterface $createdAt = null;
-
-    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    #[Groups(["getCategory"])]
-    private ?\DateTimeInterface $updatedAt = null;
-
-    #[ORM\Column(length: 255)]
-    private ?string $status = null;
 
     public function __construct()
     {
@@ -95,42 +79,6 @@ class Category
             // set the owning side to null (unless already changed)
             $coffee->setCategory(null);
         }
-
-        return $this;
-    }
-
-    public function getCreatedAt(): ?\DateTimeInterface
-    {
-        return $this->createdAt;
-    }
-
-    public function setCreatedAt(?\DateTimeInterface $createdAt = null): static
-    {
-        $this->createdAt = $createdAt != null ? $createdAt: new \DateTime();
-
-        return $this;
-    }
-
-    public function getUpdatedAt(): ?\DateTimeInterface
-    {
-        return $this->updatedAt;
-    }
-
-    public function setUpdatedAt(?\DateTimeInterface $updatedAt = null): static
-    {
-        $this->updatedAt = $updatedAt != null ? $updatedAt: new \DateTime();
-
-        return $this;
-    }
-
-    public function getStatus(): ?string
-    {
-        return $this->status;
-    }
-
-    public function setStatus(string $status): static
-    {
-        $this->status = $status;
 
         return $this;
     }
