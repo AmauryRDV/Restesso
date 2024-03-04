@@ -197,7 +197,7 @@ class TasteController extends AbstractController
         if (in_array(strtolower($isForced), $forcedVar)) {
             $coffees = $taste->getCoffees();
             foreach($coffees as $coffee) {
-                $coffee->setCategory(null);
+                $taste->removeCoffee($coffee);
                 $coffee->setUpdatedAt();
                 $coffee->setStatus('inactive');
 
@@ -207,7 +207,7 @@ class TasteController extends AbstractController
             $manager->remove($taste);
             $tagToInvalidate[] = 'coffeesCache';
         } else {
-            $taste->setStatus('active')->setUpdatedAt();
+            $taste->setStatus('inactive')->setUpdatedAt();
             $manager->persist($taste);
         }
 

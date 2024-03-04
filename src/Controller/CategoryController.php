@@ -182,9 +182,8 @@ class CategoryController extends AbstractController
         if (in_array(strtolower($isForced), $forcedVar)) {
             $coffees=$category->getCoffees();
             foreach($coffees as $coffee) {
-                $coffee->setCategory(null);
-                $coffee->setUpdatedAt();
-                $coffee->setStatus('inactive');
+                $category->removeCoffee($coffee);
+                $coffee->setUpdatedAt()->setStatus('inactive');
 
                 $manager->persist($coffee);
             }
@@ -192,8 +191,7 @@ class CategoryController extends AbstractController
 
             $tagToInvalidate[] = 'coffeesCache';
         } else {
-            $category->setStatus('inactive');
-            $category->setUpdatedAt();
+            $category->setStatus('inactive')->setUpdatedAt();
             $manager->persist($category);
         }
 
