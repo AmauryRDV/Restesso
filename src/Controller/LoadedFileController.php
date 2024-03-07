@@ -82,4 +82,21 @@ class LoadedFileController extends AbstractController
 
         return new JsonResponse($jsonFile, JsonResponse::HTTP_CREATED, ['Location' => $location], true);
     }
+
+    #[Route(
+        LoadedFileController::API_GATEWAY . '/files/{id}',
+        name: LoadedFileController::CONTROLLER_NAME_PREFIX . 'delete',
+        methods: ['DELETE']
+    )]
+    public function deleteLoadedFile(LoadedFile $loadedFile, EntityManagerInterface $manager,
+    TagAwareCacheInterface $tagAwareCacheInterface): JsonResponse
+    {
+        $loadedFile->setStatus('inactive');
+        $manager->persist($loadedFile);
+        $manager->flush();
+
+        $tagAwareCacheInterface->invalidateTags(['loadedFile']);	
+
+        return new JsonResponse($jsonFile, JsonResponse::HTTP_NO_CONTENT, [], true);
+    }
 }
