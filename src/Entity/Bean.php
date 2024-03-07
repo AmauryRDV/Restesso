@@ -21,7 +21,7 @@ class Bean extends SoftDeleteFields
     private ?int $id = null;
 
     #[ORM\Column(length: 100)]
-    #[Groups(['getBean', 'getCoffee', 'getAllBeans'])]
+    #[Groups(['getBean', 'getCoffee', 'getAllBeans', 'createBean', 'updateBean'])]
     #[Assert\Length(
         min : 2,
         max : 100,
@@ -32,11 +32,11 @@ class Bean extends SoftDeleteFields
     private ?string $name = null;
 
     #[ORM\Column(length: 200, nullable: true)]
-    #[Groups(['getBean', 'getAllBeans'])]
+    #[Groups(['getBean', 'getAllBeans', 'createBean', 'updateBean'])]
     private ?string $origin = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
-    #[Groups(['getBean', 'getAllBeans'])]
+    #[Groups(['getBean', 'getAllBeans', 'createBean', 'updateBean'])]
     private ?string $description = null;
 
     #[ORM\OneToMany(

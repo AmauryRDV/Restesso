@@ -15,6 +15,7 @@ use Faker\Generator;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Dotenv\Dotenv;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Contracts\Cache\TagAwareCacheInterface;
 
 class AppFixtures extends Fixture
 {
@@ -30,6 +31,8 @@ class AppFixtures extends Fixture
      */
     private UserPasswordHasherInterface $userPasswordHasher;
 
+    private TagAwareCacheInterface $cache;
+
     /**
      * Dotenv
      * @var Dotenv
@@ -38,11 +41,12 @@ class AppFixtures extends Fixture
 
     private LoggerInterface $logger;
 
-    public function __construct(UserPasswordHasherInterface $userPasswordHasher, LoggerInterface $loggerInterface) {
+    public function __construct(UserPasswordHasherInterface $userPasswordHasher, LoggerInterface $loggerInterface, TagAwareCacheInterface $cache) {
         $this->faker = Factory::create("fr_FR");
         $this->userPasswordHasher = $userPasswordHasher;
         $this->dotenv = new Dotenv();
         $this->logger = $loggerInterface;
+        $this->cache = $cache;
     }
 
     public function load(ObjectManager $manager): void
@@ -141,7 +145,8 @@ class AppFixtures extends Fixture
                 $manager->persist($ig);
             }
         }
-
         $manager->flush();
+
+        $this->cache->invalidateTags(["coffeesCache", "beanCache", "categoryCache", "tasteCache", "loadedFileCache"]);
     }
 }

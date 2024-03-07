@@ -19,7 +19,7 @@ class Category extends SoftDeleteFields
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['getCategory', 'getCoffee', 'getAllCategories'])]
+    #[Groups(['getCategory', 'getCoffee', 'getAllCategories', 'createCategory', 'updateCategory'])]
     #[Assert\Length(
         min : 2,
         max : 100,

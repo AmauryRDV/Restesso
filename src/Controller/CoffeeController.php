@@ -6,6 +6,7 @@ use App\Entity\Coffee;
 use App\Repository\CoffeeRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Nelmio\ApiDocBundle\Annotation\Model;
+use Nelmio\ApiDocBundle\Annotation\Security;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -30,6 +31,7 @@ class CoffeeController extends AbstractController
      *  @OA\JsonContent(type="array", @OA\Items(ref=@Model(type=Coffee::class, groups={"getAllCoffees"})))
      * )
      * @OA\Tag(name="Coffee")
+     * @Security(name="Bearer")
      */
     #[Route(
         CoffeeController::API_GATEWAY . '/coffees',
@@ -58,6 +60,7 @@ class CoffeeController extends AbstractController
      *  @OA\JsonContent(type="array", @OA\Items(ref=@Model(type=Coffee::class, groups={"getCoffee"})))
      * )
      * @OA\Tag(name="Coffee")
+     * @Security(name="Bearer")
      */
     #[Route(
         CoffeeController::API_GATEWAY . '/coffee/{id}',
@@ -75,23 +78,21 @@ class CoffeeController extends AbstractController
     }
 
     /**
-     * This method give you the possibility to create a new coffee.
-     * @OA\Parameter(name="name", in="query", description="Name of the coffee", required=true,
-     *  @OA\Schema(type="string")
+     * This method create a new coffee.
+     * @OA\RequestBody(required=true,
+     *  @OA\JsonContent(
+     *      @OA\Property(property="name", type="string", example="Café du Brésil"),
+     *      @OA\Property(property="description", type="string", example="Café du Brésil, 100% arabica"),
+     *      @OA\Property(property="category_id", type="integer", example=1),
+     *      @OA\Property(property="bean_id", type="integer", example=1),
+     *      @OA\Property(property="taste_id", type="integer", example=1),
+     *  )
      * )
-     * @OA\Parameter(name="description", in="query", description="Description of the coffee",
-     *  required=true, @OA\Schema(type="string")
-     * )
-     * @OA\Parameter(name="category", in="query", description="ID of the category", required=true,
-     *  @OA\Schema(type="integer")
-     * )
-     * @OA\Parameter(name="bean", in="query", description="ID of the bean", required=true,
-     *  @OA\Schema(type="integer")
-     * )
-     * @OA\Parameter(name="taste", in="query", description="ID of the taste", required=true,
-     *  @OA\Schema(type="string")
+     * @OA\Response(response=201, description="Return the created coffee",
+     * @OA\JsonContent(type="array", @OA\Items(ref=@Model(type=Coffee::class, groups={"getCoffee"})))
      * )
      * @OA\Tag(name="Coffee")
+     * @Security(name="Bearer")
      */
     #[Route(
         CoffeeController::API_GATEWAY . '/coffee',
@@ -103,11 +104,7 @@ class CoffeeController extends AbstractController
     ValidatorInterface $validatorInterface, TagAwareCacheInterface $tagAwareCacheInterface): JsonResponse
     {
         $coffee = $serializerInterface->deserialize($request->getContent(), Coffee::class, 'json');
-
-        // mettre à jour l'objet coffee pour mettre la date de création, d'update et le status
-        $coffee->setCreatedAt();
-        $coffee->setUpdatedAt();
-        $coffee->setStatus('active');
+        $coffee->setCreatedAt()->setUpdatedAt()->setStatus('active');
 
         $errors = $validatorInterface->validate($coffee);
         if (count($errors)) {
@@ -131,22 +128,20 @@ class CoffeeController extends AbstractController
     /**
      * This method is able to update a coffee by his Id.
      * @OA\Parameter(name="id", in="path", description="Id of the coffee", required=true, @OA\Schema(type="integer"))
-     * @OA\Parameter(name="name", in="query", description="Name of the coffee", required=false,
-     *  @OA\Schema(type="string")
+     * @OA\RequestBody(
+     *  @OA\JsonContent(
+     *     @OA\Property(property="name", type="string", example="Café du Brésil"),
+     *     @OA\Property(property="description", type="string", example="Café du Brésil, 100% arabica"),
+     *     @OA\Property(property="category_id", type="integer", example=1),
+     *     @OA\Property(property="bean_id", type="integer", example=1),
+     *     @OA\Property(property="taste_id", type="integer", example=1),
+     *  )
      * )
-     * @OA\Parameter(name="description", in="query", description="Description of the coffee", required=false,
-     *  @OA\Schema(type="string")
-     * )
-     * @OA\Parameter(name="category_id", in="query", description="ID of the category", required=false,
-     *  @OA\Schema(type="integer")
-     * )
-     * @OA\Parameter(name="bean_id", in="query", description="ID of the bean", required=false,
-     *  @OA\Schema(type="integer")
-     * )
-     * @OA\Parameter(name="taste_id", in="query", description="ID of the taste", required=false,
-     *  @OA\Schema(type="string")
+     * @OA\Response(response=200, description="Return the updated coffee",
+     * @OA\JsonContent(type="array", @OA\Items(ref=@Model(type=Coffee::class, groups={"getCoffee"})))
      * )
      * @OA\Tag(name="Coffee")
+     * @Security(name="Bearer")
      */
     #[Route(
         CoffeeController::API_GATEWAY . '/coffee/{id}',
@@ -187,7 +182,9 @@ class CoffeeController extends AbstractController
      * @OA\Parameter(name="isForced", in="path", description="Force or not the delete of a coffee", required=true,
      *  @OA\Schema(type="string", enum={"1", "true", "oui", "yes", "forced", "vrai", "force"})
      * )
+     * @OA\Response(response=204, description="No content")
      * @OA\Tag(name="Coffee")
+     * @Security(name="Bearer")
      */
     #[Route(
         CoffeeController::API_GATEWAY . '/coffee/{id}/{isForced}',
@@ -214,7 +211,9 @@ class CoffeeController extends AbstractController
     /**
      * This method soft delete a Coffee with the ID.
      * @OA\Parameter(name="id", in="path", description="Id of the coffee", required=true, @OA\Schema(type="integer"))
+     * @OA\Response(response=204, description="No content")
      * @OA\Tag(name="Coffee")
+     * @Security(name="Bearer")
      */
     #[Route(
         CoffeeController::API_GATEWAY . '/coffee/{id}',

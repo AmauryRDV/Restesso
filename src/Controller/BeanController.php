@@ -6,6 +6,7 @@ use App\Entity\Bean;
 use App\Repository\BeanRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Nelmio\ApiDocBundle\Annotation\Model;
+use Nelmio\ApiDocBundle\Annotation\Security;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -29,6 +30,7 @@ class BeanController extends AbstractController
      *  @OA\JsonContent(type="array", @OA\Items(ref=@Model(type=Bean::class, groups={"getAllBeans"})))
      * )
      * @OA\Tag(name="Bean")
+     * @Security(name="Bearer")
      */
     #[Route(
         BeanController::API_GATEWAY . '/beans',
@@ -55,6 +57,7 @@ class BeanController extends AbstractController
      *  @OA\JsonContent(type="array", @OA\Items(ref=@Model(type=Bean::class, groups={"getBean"})))
      * )
      * @OA\Tag(name="Bean")
+     * @Security(name="Bearer")
      */
     #[Route(
         BeanController::API_GATEWAY . '/bean/{id}',
@@ -71,11 +74,13 @@ class BeanController extends AbstractController
     }
 
     /**
-     * This method give you the possibility to create a new bean.
-     * @OA\Parameter(name="name", in="query", description="Name of the bean", required=true,
-     *  @OA\Schema(type="string")
+     * This method create a new bean.
+     * @OA\RequestBody(@OA\JsonContent(ref=@Model(type=Bean::class, groups={"createBean"})))
+     * @OA\Response(response=201, description="Return the created bean",
+     *  @OA\JsonContent(type="array", @OA\Items(ref=@Model(type=Bean::class, groups={"getBean"})))
      * )
      * @OA\Tag(name="Bean")
+     * @Security(name="Bearer")
      */
     #[Route(
         BeanController::API_GATEWAY . '/bean',
@@ -110,10 +115,12 @@ class BeanController extends AbstractController
     /**
      * This method is able to update a bean by her Id.
      * @OA\Parameter(name="id", in="path", description="Id of the bean", required=true, @OA\Schema(type="int"))
-     * @OA\Parameter(name="name", in="query", description="Name of the bean", required=false, @OA\Schema(type="string"))
-     * @OA\Parameter(name="status", in="query", description="Status of the bean (Can be active or unactive)",
-     *  required=false, @OA\Schema(type="string"))
+     * @OA\RequestBody(@OA\JsonContent(ref=@Model(type=Bean::class, groups={"updateBean"})))
+     * @OA\Response(response=200, description="Return the updated bean",
+     * @OA\JsonContent(type="array", @OA\Items(ref=@Model(type=Bean::class, groups={"getBean"})))
+     * )
      * @OA\Tag(name="Bean")
+     * @Security(name="Bearer")
      */
     #[Route(
         BeanController::API_GATEWAY . '/bean/{id}',
@@ -149,7 +156,9 @@ class BeanController extends AbstractController
     * @OA\Parameter(name="isForced", in="path", description="Disable or Delete a bean", required=true,
     *  @OA\Schema(type="string", enum={"1", "true", "oui", "yes", "forced", "vrai", "force"})
     * )
+    * @OA\Response(response=204, description="No content")
     * @OA\Tag(name="Bean")
+    * @Security(name="Bearer")
     */
     #[Route(
         BeanController::API_GATEWAY . '/bean/{id}/{isForced}',
@@ -187,7 +196,9 @@ class BeanController extends AbstractController
     /**
     * This method soft delete a Bean with the ID.
     * @OA\Parameter(name="id", in="path", description="Id of the bean", required=true, @OA\Schema(type="integer"))
+    * @OA\Response(response=204, description="No content")
     * @OA\Tag(name="Bean")
+    * @Security(name="Bearer")
     */
     #[Route(
         BeanController::API_GATEWAY . '/bean/{id}',

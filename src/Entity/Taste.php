@@ -27,19 +27,19 @@ class Taste extends SoftDeleteFields
         maxMessage: 'The name cannot be longer than {{ limit }} characters',
 
     )]
-    #[Groups(['getTaste', 'getCoffee', 'getAllTastes'])]
+    #[Groups(['getTaste', 'getCoffee', 'getAllTastes', 'createTaste', 'updateTaste'])]
     private ?string $name = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['getTaste', 'getAllTastes'])]
+    #[Groups(['getTaste', 'getAllTastes', 'createTaste', 'updateTaste'])]
     private ?string $description = null;
 
     #[ORM\Column]
-    #[Groups(['getTaste', 'getAllTastes'])]
+    #[Groups(['getTaste', 'getAllTastes', 'createTaste', 'updateTaste'])]
     private ?int $intensity = null;
 
     #[ORM\Column]
-    #[Groups(['getTaste', 'getAllTastes'])]
+    #[Groups(['getTaste', 'getAllTastes', 'createTaste', 'updateTaste'])]
     private ?float $caffeineRate = null;
 
     #[ORM\OneToMany(

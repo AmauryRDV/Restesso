@@ -10,16 +10,16 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\MappedSuperclass]
 abstract class SoftDeleteFields
 {
-    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     #[Groups(['getCoffee', 'getCategory', 'getBean', 'getLoadedFile', 'getTaste', 'getLoadedFile'])]
     private ?\DateTimeInterface $createdAt = null;
 
-    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     #[Assert\NotNull]
     #[Groups(['getCoffee', 'getCategory', 'getBean', 'getLoadedFile', 'getTaste', 'getLoadedFile'])]
     private ?\DateTimeInterface $updatedAt = null;
 
-    #[ORM\Column(length: 10)]
+    #[ORM\Column(length: 10, nullable: true)]
     #[Assert\Choice(choices: ['active', 'inactive'])]
     private ?string $status = null;
 

@@ -21,23 +21,23 @@ class LoadedFile extends SoftDeleteFields
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['getLoadedFile', 'getCoffee', 'getAllLoadedFiles'])]
+    #[Groups(['getLoadedFile', 'getCoffee', 'getAllLoadedFiles', 'createLoadedFile', 'updateLoadedFile'])]
     private ?string $name = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['getLoadedFile', 'getAllLoadedFiles'])]
+    #[Groups(['getLoadedFile', 'getAllLoadedFiles', 'createLoadedFile', 'updateLoadedFile'])]
     private ?string $realName = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['getLoadedFile', 'getAllLoadedFiles'])]
+    #[Groups(['getLoadedFile', 'getAllLoadedFiles', 'createLoadedFile', 'updateLoadedFile'])]
     private ?string $realPath = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['getLoadedFile', 'getAllLoadedFiles'])]
+    #[Groups(['getLoadedFile', 'getAllLoadedFiles', 'createLoadedFile', 'updateLoadedFile'])]
     private ?string $publicPath = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['getLoadedFile', 'getAllLoadedFiles'])]
+    #[Groups(['getLoadedFile', 'getAllLoadedFiles', 'createLoadedFile', 'updateLoadedFile'])]
     private ?string $mimeType = null;
 
     #[Vich\UploadableField(mapping:'pictures', fileNameProperty:'realPath')]

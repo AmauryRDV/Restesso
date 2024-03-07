@@ -6,6 +6,7 @@ use App\Entity\Taste;
 use App\Repository\TasteRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Nelmio\ApiDocBundle\Annotation\Model;
+use Nelmio\ApiDocBundle\Annotation\Security;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -30,6 +31,7 @@ class TasteController extends AbstractController
      *  @OA\JsonContent(type="array", @OA\Items(ref=@Model(type=Taste::class, groups={"getAllTasteS"})))
      * )
      * @OA\Tag(name="Taste")
+     * @Security(name="Bearer")
      */
     #[Route(
         TasteController::API_GATEWAY . '/tastes',
@@ -58,6 +60,7 @@ class TasteController extends AbstractController
      *  @OA\JsonContent(type="array", @OA\Items(ref=@Model(type=Taste::class, groups={"getTaste"})))
      * )
      * @OA\Tag(name="Taste")
+     * @Security(name="Bearer")
      */
     #[Route(
         TasteController::API_GATEWAY . '/taste/{id}',
@@ -76,19 +79,12 @@ class TasteController extends AbstractController
 
     /**
      * This method give you the possibility to create a new taste.
-     * @OA\Parameter(name="name", in="query", description="Name of the taste", required=true,
-     *  @OA\Schema(type="string")
-     * )
-     * @OA\Parameter(name="description", in="query", description="Description of the taste",
-     *  required=true, @OA\Schema(type="string")
-     * )
-     * @OA\Parameter(name="intensity", in="query", description="intensity of thhis taste", required=true,
-     *  @OA\Schema(type="integer")
-     * )
-     * @OA\Parameter(name="caffeineRate", in="query", description="caffeine rate of this taste", required=true,
-     *  @OA\Schema(type="float")
+     * @OA\RequestBody(@OA\JsonContent(ref=@Model(type=Taste::class, groups={"createTaste"})))
+     * @OA\Response(response=201, description="Return the created taste",
+     * @OA\JsonContent(type="array", @OA\Items(ref=@Model(type=Taste::class, groups={"getTaste"})))
      * )
      * @OA\Tag(name="Taste")
+     * @Security(name="Bearer")
      */
     #[Route(
         TasteController::API_GATEWAY . '/taste',
@@ -101,10 +97,7 @@ class TasteController extends AbstractController
     {
         $taste = $serializerInterface->deserialize($request->getContent(), Taste::class, 'json');
 
-        // mettre à jour l'objet taste pour mettre la date de création, d'update et le status
-        $taste->setCreatedAt();
-        $taste->setUpdatedAt();
-        $taste->setStatus('active');
+        $taste->setCreatedAt()->setUpdatedAt()->setStatus('active');
 
         $errors = $validatorInterface->validate($taste);
         if (count($errors)) {
@@ -128,19 +121,12 @@ class TasteController extends AbstractController
     /**
      * This method is able to update a taste by his Id.
      * @OA\Parameter(name="id", in="path", description="Id of the taste", required=true, @OA\Schema(type="integer"))
-     * @OA\Parameter(name="name", in="query", description="Name of the taste", required=false,
-     *  @OA\Schema(type="string")
-     * )
-     * @OA\Parameter(name="description", in="query", description="Description of the taste", required=false,
-     *  @OA\Schema(type="string")
-     * )
-     * @OA\Parameter(name="intensity", in="query", description="intensity of thhis taste", required=false,
-     *  @OA\Schema(type="integer")
-     * )
-     * @OA\Parameter(name="caffeineRate", in="query", description="caffeine rate of this taste", required=false,
-     *  @OA\Schema(type="float")
+     * @OA\RequestBody(@OA\JsonContent(ref=@Model(type=Taste::class, groups={"updateTaste"})))
+     * @OA\Response(response=200, description="Return the updated taste",
+     * @OA\JsonContent(type="array", @OA\Items(ref=@Model(type=Taste::class, groups={"getTaste"})))
      * )
      * @OA\Tag(name="Taste")
+     * @Security(name="Bearer")
      */
     #[Route(
         TasteController::API_GATEWAY . '/taste/{id}',
@@ -181,7 +167,9 @@ class TasteController extends AbstractController
      * @OA\Parameter(name="isForced", in="path", description="Force or not the delete of a taste", required=true,
      *  @OA\Schema(type="string", enum={"1", "true", "oui", "yes", "forced", "vrai", "force"})
      * )
+     * @OA\Response(response=204, description="No content")
      * @OA\Tag(name="Taste")
+     * @Security(name="Bearer")
      */
     #[Route(
         TasteController::API_GATEWAY . '/taste/{id}/{isForced}',
@@ -220,7 +208,9 @@ class TasteController extends AbstractController
     /**
      * This method soft delete a Taste with the ID.
      * @OA\Parameter(name="id", in="path", description="Id of the taste", required=true, @OA\Schema(type="integer"))
+     * @OA\Response(response=204, description="No content")
      * @OA\Tag(name="Taste")
+     * @Security(name="Bearer")
      */
     #[Route(
         TasteController::API_GATEWAY . '/taste/{id}',

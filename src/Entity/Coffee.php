@@ -18,7 +18,16 @@ class Coffee extends SoftDeleteFields
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['getCoffee', 'getTaste', 'getCategory', 'getBean', 'getLoadedFile', 'getAllCoffees'])]
+    #[Groups([
+        'getCoffee',
+        'getTaste',
+        'getCategory',
+        'getBean',
+        'getLoadedFile',
+        'getAllCoffees',
+        'createCoffee',
+        'updateCoffee'
+    ])]
     #[Assert\Length(
         min: 3,
         max: 255,
@@ -28,22 +37,24 @@ class Coffee extends SoftDeleteFields
     private ?string $name = null;
 
     #[ORM\Column(type: Types::TEXT)]
-    #[Groups(['getCoffee', 'getAllCoffees'])]
+    #[Groups(['getCoffee', 'getAllCoffees', 'createCoffee', 'updateCoffee'])]
     private ?string $description = null;
 
-    #[ORM\ManyToOne(inversedBy: 'coffees')]
+    #[ORM\ManyToOne(inversedBy: 'coffees', targetEntity: Category::class, cascade: ['persist'])]
     #[Groups(['getCoffee'])]
     private ?Category $category = null;
 
     #[ORM\ManyToOne(inversedBy: 'coffees', targetEntity: Taste::class, cascade: ['persist'])]
-    #[Groups(['getCoffee',])]
+    #[Groups(['getCoffee'])]
     private ?Taste $taste = null;
 
-    #[ORM\ManyToOne(inversedBy: 'coffees')]
+    #[ORM\ManyToOne(inversedBy: 'coffees', targetEntity: Bean::class, cascade: ['persist'])]
     #[Groups(['getCoffee'])]
     private ?Bean $bean = null;
 
     #[ORM\ManyToOne(inversedBy: 'coffees')]
+    #[ORM\JoinColumn(nullable: true)]
+    #[Groups(['getCoffee'])]
     private ?LoadedFile $coffeeImage = null;
 
     public function getId(): ?int

@@ -6,6 +6,7 @@ use App\Entity\Category;
 use App\Repository\CategoryRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Nelmio\ApiDocBundle\Annotation\Model;
+use Nelmio\ApiDocBundle\Annotation\Security;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -32,6 +33,7 @@ class CategoryController extends AbstractController
      *  @OA\JsonContent(type="array", @OA\Items(ref=@Model(type=Category::class, groups={"getAllCategories"})))
      * )
      * @OA\Tag(name="Category")
+     * @Security(name="Bearer")
      */
     #[Route(
         CategoryController::API_GATEWAY . '/categories',
@@ -61,6 +63,7 @@ class CategoryController extends AbstractController
      *  @OA\JsonContent(type="array", @OA\Items(ref=@Model(type=Category::class, groups={"getCategory"})))
      * )
      * @OA\Tag(name="Category")
+     * @Security(name="Bearer")
      */
     #[Route(
         CategoryController::API_GATEWAY . '/category/{id}',
@@ -78,11 +81,13 @@ class CategoryController extends AbstractController
     }
 
     /**
-     * This method give you the possibility to create a new category .
-     * @OA\Parameter(name="name", in="query", description="Name of the category", required=true,
-     *  @OA\Schema(type="string")
+     * This method create a new category.
+     * @OA\RequestBody(@OA\JsonContent(ref=@Model(type=Category::class, groups={"createCategory"})))
+     * @OA\Response(response=201, description="Return the created category",
+     * @OA\JsonContent(type="array", @OA\Items(ref=@Model(type=Category::class, groups={"getCategory"})))
      * )
      * @OA\Tag(name="Category")
+     * @Security(name="Bearer")
      */
     #[Route(
         CategoryController::API_GATEWAY . '/category',
@@ -118,13 +123,12 @@ class CategoryController extends AbstractController
     /**
      * This method is able to update a category by her Id.
      * @OA\Parameter(name="id", in="path", description="Id of the category", required=true, @OA\Schema(type="integer"))
-     * @OA\Parameter(name="name", in="query", description="Name of the category", required=false,
-     *  @OA\Schema(type="string")
-     * )
-     * @OA\Parameter(name="status", in="query", description="Status of the category (Can be active or unactive)",
-     *  required=false, @OA\Schema(type="string")
+     * @OA\RequestBody(@OA\JsonContent(ref=@Model(type=Category::class, groups={"updateCategory"})))
+     * @OA\Response(response=200, description="Return the updated category",
+     * @OA\JsonContent(type="array", @OA\Items(ref=@Model(type=Category::class, groups={"getCategory"})))
      * )
      * @OA\Tag(name="Category")
+     * @Security(name="Bearer")
      */
     #[Route(
         CategoryController::API_GATEWAY . '/category/{id}',
@@ -166,7 +170,9 @@ class CategoryController extends AbstractController
      * @OA\Parameter(name="isForced", in="path", description="Disable or Delete a category", required=true,
      *  @OA\Schema(type="string", enum={"1", "true", "oui", "yes", "forced", "vrai", "force"})
      * )
+     * @OA\Response(response=204, description="Category deleted")
      * @OA\Tag(name="Category")
+     * @Security(name="Bearer")
      */
     #[Route(
         CategoryController::API_GATEWAY . '/category/{id}/{isForced}',
@@ -204,7 +210,9 @@ class CategoryController extends AbstractController
     /**
      * This method soft delete a Category with the ID.
      * @OA\Parameter(name="id", in="path", description="Id of the category", required=true, @OA\Schema(type="integer"))
+     * @OA\Response(response=204, description="Category deleted")
      * @OA\Tag(name="Category")
+     * @Security(name="Bearer")
      */
     #[Route(
         CategoryController::API_GATEWAY . '/category/{id}',
