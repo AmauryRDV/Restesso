@@ -29,7 +29,7 @@ class Category extends SoftDeleteFields
     )]
     private ?string $name = null;
 
-    #[ORM\OneToMany(mappedBy: 'category', targetEntity: Coffee::class)]
+    #[ORM\OneToMany(mappedBy: 'category', targetEntity: Coffee::class, orphanRemoval: true)]
     #[Groups(['getCategory'])]
     private Collection $coffees;
 

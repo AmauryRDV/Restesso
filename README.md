@@ -44,6 +44,8 @@ php bin/console d:f:l
 symfony serve
 ```
 
+PS : Fut un temps où les postes PUT de coffee fonctionnaient, mais depuis un commit dont seul dieu en connait le hash, ces derniers ne fonctionnent plus. En cause la liaison avec nos tables. Nous avons testé, essayé, supprimé, réécrit moult fois nos lignes et nos esprits mais rien n'y fait nous restâmes bloqués à jamais.
+
 ## Auteurs
 Réalisés par :
 [Sacha](https://github.com/SachaBarbet) et [Amaury](https://github.com/AmauryRDV)

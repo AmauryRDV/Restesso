@@ -42,6 +42,7 @@ class Bean extends SoftDeleteFields
     #[ORM\OneToMany(
         mappedBy: 'bean',
         targetEntity: Coffee::class,
+        orphanRemoval: true
     )]
     #[Groups(['getBean'])]
     private Collection $coffees;

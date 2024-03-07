@@ -40,15 +40,15 @@ class Coffee extends SoftDeleteFields
     #[Groups(['getCoffee', 'getAllCoffees', 'createCoffee', 'updateCoffee'])]
     private ?string $description = null;
 
-    #[ORM\ManyToOne(inversedBy: 'coffees', targetEntity: Category::class, cascade: ['persist'])]
+    #[ORM\ManyToOne(inversedBy: 'coffees')]
     #[Groups(['getCoffee'])]
     private ?Category $category = null;
 
-    #[ORM\ManyToOne(inversedBy: 'coffees', targetEntity: Taste::class, cascade: ['persist'])]
+    #[ORM\ManyToOne(inversedBy: 'coffees', cascade: ['persist'])]
     #[Groups(['getCoffee'])]
     private ?Taste $taste = null;
 
-    #[ORM\ManyToOne(inversedBy: 'coffees', targetEntity: Bean::class, cascade: ['persist'])]
+    #[ORM\ManyToOne(inversedBy: 'coffees')]
     #[Groups(['getCoffee'])]
     private ?Bean $bean = null;
 

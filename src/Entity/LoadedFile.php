@@ -43,7 +43,7 @@ class LoadedFile extends SoftDeleteFields
     #[Vich\UploadableField(mapping:'pictures', fileNameProperty:'realPath')]
     private $file;
     
-    #[ORM\OneToMany(mappedBy: 'coffeeImage', targetEntity: Coffee::class)]
+    #[ORM\OneToMany(mappedBy: 'coffeeImage', targetEntity: Coffee::class, orphanRemoval: true)]
     #[Groups(['getLoadedFile'])]
     private Collection $coffees;
 
