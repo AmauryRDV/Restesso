@@ -5,7 +5,7 @@ nelmio_api_doc:
         description: API over HTTP
     info:
       title: Restesso ☕
-      description: Restesso is an API for coffee enthusiasts. Here, you can see the documentation for the API. Enjoy your visit !
+      description: Restesso est une API réalisée dans le cadre d'une formation API à Ynov. Elle tourne autour du café, de ses catégories, des types et différents grains de cafés.
       version: 1.0.0
     paths:
       /api/v1/login_check:
@@ -13,7 +13,7 @@ nelmio_api_doc:
           operationId: postCredentialsItem
           tags:
             - Token
-          summary: Permet d'obtenir le token JWT pour se logger.
+          summary: Permet d'obtenir le JWT pour s'authentifier ainsi qu'un refresh token.
           requestBody:
             required: true
             content:
@@ -32,7 +32,7 @@ nelmio_api_doc:
                       example: "password"
           responses:
             "200":
-              description: Récupère le token JWT
+              description: Fournit un JWT et un refresh token.
               content:
                 application/json:
                   schema:
